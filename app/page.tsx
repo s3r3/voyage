@@ -1,10 +1,8 @@
-import {Icon} from "@iconify/react"
+import Landing from "./ui/landing/landing";
 export default function Home() {
   return (
     <div>
-      <Icon icon="material-symbols-light:10mp"/>
-      
-      sad
+      <Landing/>
     </div>
   );
 }
