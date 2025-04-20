@@ -1,11 +1,13 @@
 'use client'
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/app/lib/supabase";// import supabase client
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { supabase } from "@/app/lib/supabase";
+import { Icon } from "@iconify/react";
+
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +16,7 @@ export default function LoginForm() {
 
   const handleLogin = async () => {
     setLoading(true);
-    setError(""); // Clear previous errors
+    setError("");
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -23,12 +25,11 @@ export default function LoginForm() {
 
     if (error) {
       setError(error.message);
-      setLoading(false);
     } else {
-      // Redirect or show success message
       alert("Successfully logged in!");
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -37,10 +38,10 @@ export default function LoginForm() {
         <div className="w-[416px] h-[609px] bg-black rounded-xl" />
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Login</h1>
-          <p>Login to access your Easyset24 account</p>
+          <p>Login to access your account</p>
           <div className="flex flex-col gap-3">
-            <LabelInput label="Email" type="email" placeholder="Enter your Email" onChange={(e) => setEmail(e.target.value)} />
-            <LabelInput label="Password" type="password" placeholder="Enter Password" onChange={(e) => setPassword(e.target.value)} />
+            <LabelInput label="Email" type="email" placeholder="Enter your Email" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} />
+            <LabelInput label="Password" type="password" placeholder="Enter Password" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
           </div>
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
@@ -56,9 +57,6 @@ export default function LoginForm() {
             </Button>
             <p className="text-center">or</p>
             <SocialIcons />
-            <p className="text-center">
-              Don't have an account? <span className="text-blue-400 cursor-pointer">Register!</span>
-            </p>
           </div>
         </div>
       </div>
@@ -66,17 +64,7 @@ export default function LoginForm() {
   );
 }
 
-function LabelInput({
-  label,
-  type,
-  placeholder,
-  onChange,
-}: {
-  label: string;
-  type: string;
-  placeholder: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) {
+function LabelInput({ label, type, placeholder, onChange }: any) {
   return (
     <div className="flex flex-col gap-2">
       <Label>{label}</Label>
@@ -95,10 +83,7 @@ function SocialIcons() {
   return (
     <div className="flex justify-center gap-5">
       {icons.map(({ icon, alt }) => (
-        <div
-          key={alt}
-          className="w-[48px] h-[48px] bg-white rounded-md flex items-center justify-center"
-        >
+        <div key={alt} className="w-[48px] h-[48px] bg-white rounded-md flex items-center justify-center">
           <Icon icon={icon} className="w-6 h-6" />
         </div>
       ))}
