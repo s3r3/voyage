@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { supabase } from "@/app/lib/supabase"; // Supabase client
+import prisma from "@/app/lib/prisma"; // Prisma client
 import bcrypt from "bcryptjs";
-import prisma from "@/app/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -11,22 +12,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // Create a new user in Supabase
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
     });
 
-    if (existingUser) {
-      return NextResponse.json({ error: "User already exists" }, { status: 400 });
+    if (signUpError) {
+      return NextResponse.json({ error: signUpError.message }, { status: 400 });
     }
 
+    // Encrypt password menggunakan bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Simpan pengguna baru ke database menggunakan Prisma
     const newUser = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         firstName,
         lastName,
+         // Relasi dengan Supabase user ID
       },
     });
 
