@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/app/lib/supabase";
+import { useSession } from "@/app/lib/auth";
 import { Icon } from "@iconify/react";
 
 export default function LoginForm() {
@@ -13,6 +14,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const session = useSession()
 
   const handleLogin = async () => {
     setLoading(true);
@@ -31,6 +33,20 @@ export default function LoginForm() {
 
     setLoading(false);
   };
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    alert("Logged out successfully!");
+  };
+
+  if (session) {
+    // Jika sudah login, tampilkan nama pengguna
+    return (
+      <div>
+        <p>Welcome, {session.user?.email}</p>
+        <Button onClick={handleLogout}>Logout</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center pt-15 w-full">

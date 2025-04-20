@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/app/lib/supabase";
+import { supabase } from "@/app/lib/supabase"; // Pastikan Supabase sudah di-set dengan benar
 import { Icon } from "@iconify/react/dist/iconify.js";
+
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,10 +21,10 @@ export default function RegisterForm() {
       setError("Passwords don't match");
       return;
     }
-
+  
     setLoading(true);
     setError("");
-
+  
     const res = await fetch("/api/register", {
       method: "POST",
       headers: {
@@ -36,19 +37,18 @@ export default function RegisterForm() {
         lastName,
       }),
     });
-
+  
     const data = await res.json();
-
+  
     if (res.ok) {
-      alert(
-        "Successfully registered! Check your email to confirm your account."
-      );
+      alert("Successfully registered! Check your email to confirm your account.");
     } else {
       setError(data.error || "Something went wrong");
     }
-
+  
     setLoading(false);
   };
+  
 
   return (
     <div className="flex justify-center pt-15 w-full">
