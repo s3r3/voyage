@@ -8,39 +8,43 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, password, firstName, lastName } = body;
 
+    console.log("📥 Request body:", body);
+
     if (!email || !password || !firstName || !lastName) {
+      console.error("⚠️ Missing fields");
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Create a new user in Supabase
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error: supabaseError } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    if (supabaseError) {
+      console.error("❌ Supabase signup error:", supabaseError.message);
+      return NextResponse.json({ error: supabaseError.message }, { status: 400 });
     }
 
-    // Encrypt password using bcrypt
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("🔐 Password hashed");
 
-    // Save the new user to the database using Prisma
     const newUser = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         firstName,
         lastName,
-        // Relation with Supabase user ID
       },
     });
+
+    console.log("✅ User created in DB:", newUser);
 
     return NextResponse.json(
       { message: "User registered. Please check your email to confirm.", data },
       { status: 200 }
     );
   } catch (error) {
+    console.error("🔥 Internal server error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
