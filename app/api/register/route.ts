@@ -26,21 +26,33 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Save the new user to the database using Prisma
+    try {
     const newUser = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         firstName,
         lastName,
-        // Relation with Supabase user ID
       },
     });
 
-    return NextResponse.json(
-      { message: "User registered. Please check your email to confirm.", data },
-      { status: 200 }
-    );
+      return NextResponse.json({
+        message: "User registered. Please check your email to confirm.",
+        data: newUser,
+      }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+      console.error("Database registration error:", error);
+
+      return NextResponse.json({
+        error: error instanceof Error ? error.message : "Database error",
+      }, { status: 500 });
   }
+  } catch (error) {
+    console.error("Registration error:", error);
+
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Internal server error" },
+      { status: 500 },
+    );
+}
 }
