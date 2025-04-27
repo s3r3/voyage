@@ -1,7 +1,7 @@
 // app/api/offers/route.ts
 
 import { NextResponse } from "next/server";
-import prisma from "../../lib/prisma"; // Pastikan prisma instance sudah siap
+import prisma from "../../lib/prisma"; // Make sure prisma instance is ready
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,23 +10,23 @@ export async function GET(req: Request) {
   try {
     let offers;
 
-    // Jika filter type tidak ada atau 'all', ambil semua data
+    // If filter type doesn't exist or 'all', grab all data
     if (!type || type === "all") {
-      offers = await prisma.offer.findMany(); // Gunakan lowercase 'offer'
+      offers = await prisma.Offer.findMany(); // Use capital "O" here
     } else {
-      // Ambil data berdasarkan type
-      offers = await prisma.offer.findMany({ // Gunakan lowercase 'offer'
+      // Grab data based on type
+      offers = await prisma.Offer.findMany({ // Use capital "O" here
         where: {
           type: type,
         },
       });
     }
 
-    // Kirimkan response dalam format JSON
+    // Send response in JSON format
     return NextResponse.json(offers);
   } catch (error) {
     console.error(error); // Log the error for debugging
-    // Tangani error dan kirimkan respons error dengan status 500
+    // Handle error and send error response with status 500
     return NextResponse.json({ error: "Failed to fetch offers" }, { status: 500 });
   }
 }
