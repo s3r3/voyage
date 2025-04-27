@@ -12,10 +12,10 @@ export async function GET(req: Request) {
 
     // Jika filter type tidak ada atau 'all', ambil semua data
     if (!type || type === "all") {
-      offers = await prisma.offer.findMany();
+      offers = await prisma.Offer.findMany();
     } else {
       // Ambil data berdasarkan type
-      offers = await prisma.offer.findMany({
+      offers = await prisma.Offer.findMany({
         where: {
           type: type,
         },
