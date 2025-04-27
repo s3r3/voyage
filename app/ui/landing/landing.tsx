@@ -11,6 +11,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useFlightStore } from "@/app/store/dateFlight";
 import GuestSelector from "../../ui/landing/GuestSleector"; // Perbaiki path import
+import SpecialOffers from "./SpecialOffer";
 
 const FlightDateRangePicker = () => {
   const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } = useFlightStore();
@@ -119,20 +120,7 @@ const Landing = () => {
 
       {/* Special Offer Section */}
       <section className="px-4 pt-20">
-        <h1 className="text-[32px] font-bold">Special Offer</h1>
-        <div className="flex gap-5 mt-4">
-          {["All", "Hotels", "Flight", "Multi"].map((label) => (
-            <div key={label} className="flex items-center space-x-2">
-              <Checkbox id={label.toLowerCase()} className="rounded-full" />
-              <Label
-                htmlFor={label.toLowerCase()}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {label}
-              </Label>
-            </div>
-          ))}
-        </div>
+        <SpecialOffers/>
       </section>
     </div>
   );
