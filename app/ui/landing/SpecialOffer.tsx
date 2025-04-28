@@ -1,38 +1,39 @@
-// app/ui/landing/SpecialOffer.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabase";
 
 interface Offer {
   id: number;
   title: string;
   type: string;
-  image_url: string;
+  imageUrl: string;
 }
 
 export default function SpecialOffers() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [filter, setFilter] = useState<string>("all");
 
-  useEffect(() => {
-    // Fungsi untuk mengambil penawaran dari API
-    async function fetchOffers() {
-      try {
-        const res = await fetch(`/api/offers?type=${filter}`);
-        if (res.ok) {
-          const data = await res.json();
-          setOffers(data);
-        } else {
-          console.error("Failed to fetch offers");
-        }
-      } catch (error) {
-        console.error("Error fetching offers:", error);
-      }
-    }
+  async function fetchOffersByType(filter: string) {
+    try {
+      let query = supabase.from("Offer").select("*");
 
-    fetchOffers();
-  }, [filter]); // Re-fetch saat filter berubah
+      if (filter !== "all") {
+        query = query.eq("type", filter);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setOffers(data || []);
+    } catch (error) {
+      console.error("Error fetching offers:", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchOffersByType(filter);
+  }, [filter]);
 
   return (
     <div className="p-6">
@@ -60,7 +61,7 @@ export default function SpecialOffers() {
           offers.map((offer) => (
             <div key={offer.id} className="relative">
               <img
-                src={offer.image_url}
+                src={offer.imageUrl}
                 alt={offer.title}
                 className="w-full h-64 object-cover rounded-lg"
               />
