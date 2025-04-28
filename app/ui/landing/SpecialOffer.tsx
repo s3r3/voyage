@@ -17,7 +17,7 @@ export default function SpecialOffers() {
 
   async function fetchOffers(filter: string) {
     try {
-      const response = await fetch(`/api/offers?type=${filter}`);
+      const response = await fetch(`/api/offer?type=${filter}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
