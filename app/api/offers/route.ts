@@ -1,22 +1,22 @@
 import { NextResponse } from "next/server";
-import { supabase } from "../../lib/supabase"; // Pastikan path sesuai
+import prisma from "@/app/lib/prisma"; // Pastikan path sesuai
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type") || "all";
 
   try {
-    let query = supabase.from("Offer").select("id, title, type, imageUrl"); // Sesuaikan kolom
+    let query = prisma.offer.findMany({
+      select: { id: true, title: true, type: true, imageUrl: true },
+    });
 
     if (type !== "all") {
-      query = query.eq("type", type);
+      query = query.where({ type });
     }
 
-    const { data, error } = await query;
+    const offers = await query;
 
-    if (error) throw error;
-
-    return NextResponse.json(data);
+    return NextResponse.json(offers);
   } catch (error) {
     console.error("Error fetching offers:", error);
     return NextResponse.json({ error: "Failed to fetch offers" }, { status: 500 });
