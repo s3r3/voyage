@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/app/lib/supabase";
 
 interface Offer {
   id: number;
@@ -13,27 +12,40 @@ interface Offer {
 export default function SpecialOffers() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [filter, setFilter] = useState<string>("all");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  async function fetchOffersByType(filter: string) {
+  async function fetchOffers(filter: string) {
     try {
-      let query = supabase.from("Offer").select("*");
+      const response = await fetch(`/api/offers?type=${filter}`);
 
-      if (filter !== "all") {
-        query = query.eq("type", filter);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setOffers(data || []);
-    } catch (error) {
-      console.error("Error fetching offers:", error);
+      const data = await response.json();
+      setOffers(data);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch offers");
+      console.error("Error fetching offers:", err);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchOffersByType(filter);
+    setLoading(true);
+    fetchOffers(filter);
   }, [filter]);
+
+  if (loading) {
+    return <div className="p-6 text-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-500">{error}</div>;
+  }
 
   return (
     <div className="p-6">
