@@ -1,4 +1,4 @@
-// /components/SpecialOffers.tsx
+// app/ui/landing/SpecialOffer.tsx
 
 "use client";
 
