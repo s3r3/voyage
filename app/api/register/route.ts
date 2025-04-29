@@ -24,22 +24,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
-    // Insert additional user data (firstName, lastName) into the `users` table
+    // Insert additional user data into the `users` table
     const { error: dbError } = await supabase
       .from("users")
       .insert({
         id: authData.user?.id, // Use the user ID from Supabase Auth
         email,
-        first_name: firstName, // Adjust column name if different
-        last_name: lastName,   // Adjust column name if different
+        firstName, // Use camelCase if your Supabase table columns match
+        lastName,  // Use camelCase if your Supabase table columns match
       });
 
     if (dbError) {
       // Rollback: Delete the user from auth if database insertion fails
-      if (!authData.user?.id) {
-        throw new Error("User ID is undefined. Cannot delete user.");
+      if (authData.user?.id) {
+        await supabase.auth.admin.deleteUser(authData.user.id);
       }
-      await supabase.auth.admin.deleteUser(authData.user.id);
       return NextResponse.json({ error: dbError.message }, { status: 400 });
     }
 
