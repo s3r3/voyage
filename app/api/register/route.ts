@@ -1,74 +1,55 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { email, password, firstName, lastName } = body;
 
-    // Input validation
+    // Validate input fields
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Check if email already exists
-    const { data: existingUser, error: checkError } = await supabase
-      .from("User")
-      .select("id")
-      .eq("email", email)
-      .single();
+    // Sign up user with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-    if (checkError && checkError.code !== "PGRST116") {
-      // PGRST116 = no rows found
-      throw checkError;
+    if (authError) {
+      return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "Email already registered" },
-        { status: 409 } // Conflict
-      );
-    }
+    // Hash password (optional, as Supabase already handles this for auth)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insert new user (without hashing the password)
-    const { data: newUser, error: insertError } = await supabase
-      .from("User")
+    // Insert user data into the `users` table in Supabase
+    const { data: userData, error: insertError } = await supabase
+      .from("users") // Assuming your table name is "users"
       .insert({
+        id: authData.user?.id, // Use the user ID from Supabase Auth
         email,
-        password, // Store password in plain text
         firstName,
         lastName,
-      })
-      .select("id, email, firstName, lastName")
-      .single();
+        // password: hashedPassword, // Not needed if Supabase handles auth
+      });
 
     if (insertError) {
-      throw insertError;
+      return NextResponse.json({ error: insertError.message }, { status: 400 });
     }
 
-    return NextResponse.json(
-      {
-        message: "Registration successful",
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          firstName: newUser.firstName,
-          lastName: newUser.lastName,
-        },
-      },
-      { status: 201 }
-    );
+    return NextResponse.json({
+      message: "User registered. Please check your email to confirm.",
+      data: userData,
+    }, { status: 200 });
+
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      {
-        error: (error as any).message || "Registration failed",
-        code: (error as any).code,
-      },
-      { status: (error as any).status || 500 }
+      { error: error instanceof Error ? error.message : "Internal server error" },
+      { status: 500 },
     );
   }
 }
