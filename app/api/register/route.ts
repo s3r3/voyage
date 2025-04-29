@@ -26,12 +26,12 @@ export async function POST(req: Request) {
 
     // Simpan data tambahan ke tabel `User` di database
     const { error: insertError } = await supabase
-      .from("User") // Sesuaikan dengan nama tabel di Supabase (harus sama dengan Prisma schema)
+      .from("User")
       .insert({
         id: authData.user?.id, // Gunakan ID dari Supabase Auth
         email,
-        firstName,
-        lastName,
+        firstname: firstName, // Sesuaikan dengan nama kolom di Supabase
+        lastname: lastName,   // Sesuaikan dengan nama kolom di Supabase
       });
 
     if (insertError) {
