@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,20 +8,26 @@ import { Label } from "@/components/ui/label";
 import { Icon } from "@iconify/react";
 
 export default function RegisterForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Password match validation
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match");
       return;
     }
@@ -32,14 +39,12 @@ export default function RegisterForm() {
     try {
       const response = await fetch("/api/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          lastName,
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
         }),
       });
 
@@ -47,12 +52,13 @@ export default function RegisterForm() {
 
       if (response.ok) {
         setSuccess(true);
-        // Clear form fields on success
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-        setFirstName("");
-        setLastName("");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
       } else {
         setError(result.error || "Registration failed");
       }
@@ -70,68 +76,58 @@ export default function RegisterForm() {
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Register</h1>
           <form onSubmit={handleRegister} className="flex flex-col gap-3">
-            {/* First Name and Last Name */}
             <div className="flex gap-3">
               <LabelInput
                 label="First Name"
-                type="text"
-                value={firstName}
-                onChange={setFirstName}
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
                 required
               />
               <LabelInput
                 label="Last Name"
-                type="text"
-                value={lastName}
-                onChange={setLastName}
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
                 required
               />
             </div>
-
-            {/* Email */}
             <LabelInput
               label="Email"
               type="email"
-              value={email}
-              onChange={setEmail}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               required
             />
-
-            {/* Password */}
             <LabelInput
               label="Password"
               type="password"
-              value={password}
-              onChange={setPassword}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               required
             />
-
-            {/* Confirm Password */}
             <LabelInput
               label="Confirm Password"
               type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
               required
             />
-
-            {/* Terms and Privacy Checkbox */}
             <div className="flex items-center gap-2">
               <Checkbox id="terms" required />
               <Label htmlFor="terms">
                 I agree to all the Terms and Privacy Policies
               </Label>
             </div>
-
-            {/* Error and Success Messages */}
             {error && <p className="text-red-500 text-center">{error}</p>}
             {success && (
               <p className="text-green-500 text-center">
                 Check your email to confirm your account!
               </p>
             )}
-
-            {/* Submit Button */}
             <Button
               type="submit"
               className="bg-blue-500 w-full text-white mt-4"
@@ -140,8 +136,6 @@ export default function RegisterForm() {
               {loading ? "Registering..." : "Register Now"}
             </Button>
           </form>
-
-          {/* Social Login Section */}
           <div className="flex flex-col items-center gap-5 pt-5">
             <p className="text-center">or</p>
             <SocialIcons />
@@ -155,15 +149,17 @@ export default function RegisterForm() {
 // Reusable LabelInput Component
 function LabelInput({
   label,
-  type,
+  type = "text",
+  name,
   value,
   onChange,
   required = false,
 }: {
   label: string;
-  type: string;
+  type?: string;
+  name: string;
   value: string;
-  onChange: (value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
 }) {
   return (
@@ -171,8 +167,9 @@ function LabelInput({
       <Label>{label}</Label>
       <Input
         type={type}
+        name={name}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
         className="bg-white"
         required={required}
       />
@@ -184,8 +181,8 @@ function LabelInput({
 function SocialIcons() {
   const icons = [
     { icon: "logos:facebook", alt: "Facebook" },
-    { icon: "ic:baseline-apple", alt: "Apple" },
-    { icon: "flat-color-icons:google", alt: "Google" },
+    { icon: "ic:baseline-apple", alt: "Google" }, // Corrected alt text
+    { icon: "flat-color-icons:google", alt: "Apple" }, // Corrected alt text
   ];
 
   return (
