@@ -1,29 +1,32 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
+  output = "./node_modules/@prisma/client"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid()) @db.Uuid
   email     String   @unique
-  password  String
+  password  String?  // Optional if using Supabase Auth
   firstName String
   lastName  String
   createdAt DateTime @default(now())
+
+  @@map("User") // Ensure table name matches Supabase
 }
 
 model Offer {
-  id        Int       @id @default(autoincrement())
+  id        String   @id @default(uuid()) @db.Uuid
   title     String
   type      OfferType
-  imageUrl  String
-  createdAt DateTime  @default(now())
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  @@map("offers") // Ensure table name matches Supabase
 }
 
 enum OfferType {

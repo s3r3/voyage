@@ -19,6 +19,7 @@ export default function RegisterForm() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Password match validation
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       return;
@@ -46,6 +47,7 @@ export default function RegisterForm() {
 
       if (response.ok) {
         setSuccess(true);
+        // Clear form fields on success
         setEmail("");
         setPassword("");
         setConfirmPassword("");
@@ -68,6 +70,7 @@ export default function RegisterForm() {
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Register</h1>
           <form onSubmit={handleRegister} className="flex flex-col gap-3">
+            {/* First Name and Last Name */}
             <div className="flex gap-3">
               <LabelInput
                 label="First Name"
@@ -84,6 +87,8 @@ export default function RegisterForm() {
                 required
               />
             </div>
+
+            {/* Email */}
             <LabelInput
               label="Email"
               type="email"
@@ -91,6 +96,8 @@ export default function RegisterForm() {
               onChange={setEmail}
               required
             />
+
+            {/* Password */}
             <LabelInput
               label="Password"
               type="password"
@@ -98,6 +105,8 @@ export default function RegisterForm() {
               onChange={setPassword}
               required
             />
+
+            {/* Confirm Password */}
             <LabelInput
               label="Confirm Password"
               type="password"
@@ -105,6 +114,8 @@ export default function RegisterForm() {
               onChange={setConfirmPassword}
               required
             />
+
+            {/* Terms and Privacy Checkbox */}
             <div className="flex items-center gap-2">
               <Checkbox id="terms" required />
               <Label htmlFor="terms">
@@ -112,6 +123,7 @@ export default function RegisterForm() {
               </Label>
             </div>
 
+            {/* Error and Success Messages */}
             {error && <p className="text-red-500 text-center">{error}</p>}
             {success && (
               <p className="text-green-500 text-center">
@@ -119,6 +131,7 @@ export default function RegisterForm() {
               </p>
             )}
 
+            {/* Submit Button */}
             <Button
               type="submit"
               className="bg-blue-500 w-full text-white mt-4"
@@ -128,6 +141,7 @@ export default function RegisterForm() {
             </Button>
           </form>
 
+          {/* Social Login Section */}
           <div className="flex flex-col items-center gap-5 pt-5">
             <p className="text-center">or</p>
             <SocialIcons />
@@ -138,6 +152,7 @@ export default function RegisterForm() {
   );
 }
 
+// Reusable LabelInput Component
 function LabelInput({
   label,
   type,
@@ -165,8 +180,8 @@ function LabelInput({
   );
 }
 
+// Social Icons Component
 function SocialIcons() {
-  // Defining social media icons array
   const icons = [
     { icon: "logos:facebook", alt: "Facebook" },
     { icon: "ic:baseline-apple", alt: "Apple" },
@@ -175,7 +190,6 @@ function SocialIcons() {
 
   return (
     <div className="flex justify-center gap-5">
-      {/* Rendering each social media icon */}
       {icons.map(({ icon, alt }) => (
         <div
           key={alt}

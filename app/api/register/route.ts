@@ -8,10 +8,13 @@ export async function POST(req: Request) {
 
     // Validate input fields
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    // Sign up user with Supabase Auth
+    // Sign up user with Supabase Auth and store additional data
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -27,30 +30,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
-    // Insert additional user data into the `User` table
-    const { error: insertError } = await supabase.from("User").insert({
-      id: authData.user?.id, // Use the user ID from Supabase Auth
-      email,
-      firstName,
-      lastName,
-    });
-
-    if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 400 });
-    }
+    // Supabase Auth automatically creates a user record in the `auth.users` table
+    // No need to manually insert into the `User` table if you're using Supabase Auth
 
     return NextResponse.json(
       {
-        message: "User registered. Please check your email to confirm.",
+        message:
+          "User registered successfully. Check your email for confirmation.",
       },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
