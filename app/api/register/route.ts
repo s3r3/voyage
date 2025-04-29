@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/app/lib/prisma'; // Adjust the import path as needed
 import { createClient } from '@supabase/supabase-js';
+
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
 
     // Validate input fields
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     // Sign up user with Supabase Auth
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Insert user data into the `users` table via Prisma
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
         id: authData.user?.id, // Use the user ID from Supabase Auth
         email,
