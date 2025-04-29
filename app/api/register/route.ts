@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Sign up user with Supabase Auth and store additional data
+    // Sign up user with Supabase Auth and store additional data in metadata
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
@@ -30,8 +30,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
-    // Supabase Auth automatically creates a user record in the `auth.users` table
-    // No need to manually insert into the `User` table if you're using Supabase Auth
+    // If you want to store additional data in a separate table (optional)
+    // Uncomment and configure the following lines:
+    /*
+    const { data: userData, error: insertError } = await supabase
+      .from("User") // Ensure this matches your Prisma schema or Supabase table
+      .insert({
+        id: authData.user?.id,
+        email,
+        firstName,
+        lastName,
+      });
+
+    if (insertError) {
+      return NextResponse.json({ error: insertError.message }, { status: 400 });
+    }
+    */
 
     return NextResponse.json(
       {
