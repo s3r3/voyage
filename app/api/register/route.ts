@@ -17,12 +17,13 @@ export async function POST(req: Request) {
 
     // Check if email already exists
     const { data: existingUser, error: checkError } = await supabase
-      .from('User')
-      .select('id')
-      .eq('email', email)
+      .from("User")
+      .select("id")
+      .eq("email", email)
       .single();
 
-    if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
+    if (checkError && checkError.code !== "PGRST116") {
+      // PGRST116 = no rows found
       throw checkError;
     }
 
@@ -38,14 +39,14 @@ export async function POST(req: Request) {
 
     // Insert new user
     const { data: newUser, error: insertError } = await supabase
-      .from('User')
+      .from("User")
       .insert({
         email,
         password_hash: hashedPassword,
-        first_name: firstName,
-        last_name: lastName,
+        firstName: firstName,
+        lastName: lastName,
       })
-      .select('id, email, first_name, last_name')
+      .select("id, email, firstName, lastName")
       .single();
 
     if (insertError) {
@@ -58,19 +59,18 @@ export async function POST(req: Request) {
         user: {
           id: newUser.id,
           email: newUser.email,
-          first_name: newUser.first_name,
-          last_name: newUser.last_name,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
         },
       },
       { status: 201 }
     );
-
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { 
+      {
         error: (error as any).message || "Registration failed",
-        code: (error as any).code 
+        code: (error as any).code,
       },
       { status: (error as any).status || 500 }
     );
