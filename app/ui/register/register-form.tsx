@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/app/lib/supabase"; // Pastikan Supabase sudah di-set dengan benar
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 
 export default function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -15,40 +14,52 @@ export default function RegisterForm() {
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const handleRegister = async () => {
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       return;
     }
-  
+
     setLoading(true);
     setError("");
-  
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-        firstName,
-        lastName,
-      }),
-    });
-  
-    const data = await res.json();
-  
-    if (res.ok) {
-      alert("Successfully registered! Check your email to confirm your account.");
-    } else {
-      setError(data.error || "Something went wrong");
+    setSuccess(false);
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          firstName,
+          lastName,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setFirstName("");
+        setLastName("");
+      } else {
+        setError(result.error || "Registration failed");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  
-    setLoading(false);
   };
-  
 
   return (
     <div className="flex justify-center pt-15 w-full">
@@ -56,55 +67,68 @@ export default function RegisterForm() {
         <div className="w-[416px] h-[609px] bg-black rounded-xl" />
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Register</h1>
-          <div className="flex gap-3">
-            <LabelInput
-              label="First Name"
-              type="text"
-              placeholder="Enter your First Name"
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <LabelInput
-              label="Last Name"
-              type="text"
-              placeholder="Enter your Last Name"
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-3">
+          <form onSubmit={handleRegister} className="flex flex-col gap-3">
+            <div className="flex gap-3">
+              <LabelInput
+                label="First Name"
+                type="text"
+                value={firstName}
+                onChange={setFirstName}
+                required
+              />
+              <LabelInput
+                label="Last Name"
+                type="text"
+                value={lastName}
+                onChange={setLastName}
+                required
+              />
+            </div>
             <LabelInput
               label="Email"
               type="email"
-              placeholder="Enter your Email"
-              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              onChange={setEmail}
+              required
             />
             <LabelInput
               label="Password"
               type="password"
-              placeholder="Enter your password"
-              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              onChange={setPassword}
+              required
             />
             <LabelInput
               label="Confirm Password"
               type="password"
-              placeholder="Confirm your password"
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              required
             />
             <div className="flex items-center gap-2">
-              <Checkbox id="remember" />
-              <Label htmlFor="remember">
+              <Checkbox id="terms" required />
+              <Label htmlFor="terms">
                 I agree to all the Terms and Privacy Policies
               </Label>
             </div>
-          </div>
-          {error && <p className="text-red-500 text-center">{error}</p>}
-          <div className="flex flex-col gap-5 pt-5">
+
+            {error && <p className="text-red-500 text-center">{error}</p>}
+            {success && (
+              <p className="text-green-500 text-center">
+                Check your email to confirm your account!
+              </p>
+            )}
+
             <Button
-              className="bg-blue-500 w-full text-white"
-              onClick={handleRegister}
+              type="submit"
+              className="bg-blue-500 w-full text-white mt-4"
               disabled={loading}
             >
               {loading ? "Registering..." : "Register Now"}
             </Button>
+          </form>
+
+          <div className="flex flex-col items-center gap-5 pt-5">
             <p className="text-center">or</p>
             <SocialIcons />
           </div>
@@ -117,28 +141,32 @@ export default function RegisterForm() {
 function LabelInput({
   label,
   type,
-  placeholder,
+  value,
   onChange,
+  required = false,
 }: {
   label: string;
   type: string;
-  placeholder: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+  onChange: (value: string) => void;
+  required?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2">
       <Label>{label}</Label>
       <Input
         type={type}
-        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="bg-white"
-        onChange={onChange}
+        required={required}
       />
     </div>
   );
 }
 
 function SocialIcons() {
+  // Defining social media icons array
   const icons = [
     { icon: "logos:facebook", alt: "Facebook" },
     { icon: "ic:baseline-apple", alt: "Apple" },
@@ -147,6 +175,7 @@ function SocialIcons() {
 
   return (
     <div className="flex justify-center gap-5">
+      {/* Rendering each social media icon */}
       {icons.map(({ icon, alt }) => (
         <div
           key={alt}

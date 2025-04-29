@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
-import prisma from "@/app/lib/prisma";
-import bcrypt from "bcryptjs"; // <-- tambahkan ini
 
 export async function POST(req: Request) {
   try {
@@ -12,32 +10,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    // Buat user baru di Supabase Auth
-    const { data, error: supabaseError } = await supabase.auth.signUp({
+    // Sign up user with Supabase Auth (automatically handles email confirmation)
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-    });
-
-    if (supabaseError) {
-      return NextResponse.json({ error: supabaseError.message }, { status: 400 });
-    }
-
-    // Hash password sebelum simpan ke database
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Simpan data user ke database kamu
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        firstName,
-        lastName,
-        password: hashedPassword, // <-- disini sudah aman
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+        },
       },
     });
 
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     return NextResponse.json({
       message: "User registered. Please check your email to confirm.",
-      data: newUser,
+      data: {
+        id: data.user?.id,
+        email: data.user?.email,
+        first_name: firstName,
+        last_name: lastName,
+      },
     }, { status: 200 });
 
   } catch (error) {
