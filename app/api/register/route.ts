@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     }
 
     // Insert user data into the `users` table via Prisma
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
         id: authData.user?.id, // Use the user ID from Supabase Auth
         email,
