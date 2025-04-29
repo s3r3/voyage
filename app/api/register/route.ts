@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
-import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
@@ -34,17 +33,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Insert new user
+    // Insert new user (without hashing the password)
     const { data: newUser, error: insertError } = await supabase
       .from("User")
       .insert({
         email,
-        password_hash: hashedPassword,
-        firstName: firstName,
-        lastName: lastName,
+        password, // Store password in plain text
+        firstName,
+        lastName,
       })
       .select("id, email, firstName, lastName")
       .single();
