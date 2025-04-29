@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     // Check if email already exists
     const { data: existingUser, error: checkError } = await supabase
-      .from('users')
+      .from('user')
       .select('id')
       .eq('email', email)
       .single();
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
     // Insert new user
     const { data: newUser, error: insertError } = await supabase
-      .from('users')
+      .from('user')
       .insert({
         email,
         password_hash: hashedPassword,
