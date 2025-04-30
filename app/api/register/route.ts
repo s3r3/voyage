@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       data: {
         email,
         password: hashedPassword,
-        fullName,
+        full_name: fullName,
       },
     });
 
