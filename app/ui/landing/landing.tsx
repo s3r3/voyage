@@ -1,17 +1,16 @@
 // app/ui/landing/landing.tsx
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Input } from "../../../components/ui/input";
+import { Button } from  "../../../components/ui/button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useFlightStore } from "@/app/store/dateFlight";
-import GuestSelector from "../../ui/landing/GuestSleector"; // Perbaiki path import
-import SpecialOffers from "./SpecialOffer";
+import { useFlightStore } from '../../store/dateFlight'
+import GuestSelector from "../landing/GuestSleector" // Corrected path
+import SpecialOffers from "../landing/SpecialOffer"; // Corrected path
 
 const FlightDateRangePicker = () => {
   const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } = useFlightStore();
