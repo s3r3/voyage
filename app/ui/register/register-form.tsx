@@ -9,7 +9,6 @@ import { Icon } from "@iconify/react";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
-    fullName: "", // Changed to fullName
     email: "",
     password: "",
     confirmPassword: "",
@@ -42,8 +41,7 @@ export default function RegisterForm() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          fullName: formData.fullName, // Send fullName instead of firstName/lastName
-        }),
+        }), // Removed fullName
       });
 
       const result = await response.json();
@@ -51,7 +49,6 @@ export default function RegisterForm() {
       if (response.ok) {
         setSuccess(true);
         setFormData({
-          fullName: "", // Reset fullName
           email: "",
           password: "",
           confirmPassword: "",
@@ -73,14 +70,7 @@ export default function RegisterForm() {
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Register</h1>
           <form onSubmit={handleRegister} className="flex flex-col gap-3">
-            {/* Replaced firstName/lastName with fullName */}
-            <LabelInput
-              label="Full Name"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-            />
+            {/* Removed Full Name Input */}
             <LabelInput
               label="Email"
               type="email"
@@ -170,8 +160,8 @@ function LabelInput({
 function SocialIcons() {
   const icons = [
     { icon: "logos:facebook", alt: "Facebook" },
-    { icon: "ic:baseline-apple", alt: "Apple" }, // Corrected alt text
-    { icon: "flat-color-icons:google", alt: "Google" }, // Corrected alt text
+    { icon: "ic:baseline-apple", alt: "Apple" },
+    { icon: "flat-color-icons:google", alt: "Google" },
   ];
 
   return (
