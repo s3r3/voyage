@@ -1,13 +1,27 @@
-import { NextResponse } from 'next/server';
-import prisma  from '@/app/lib/prisma'; // Sesuaikan path dengan struktur project
+import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/app/lib/supabase";
 
-// GET /api/offers
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const type = searchParams.get("type") || "all";
+
   try {
-    const offers = await prisma.offer.findMany();
-    return NextResponse.json(offers, { status: 200 });
+    let query = supabase.from("offers").select("*");
+
+    if (type !== "all") {
+      query = query.eq("type", type);
+    }
+
+    const { data: offers, error } = await query;
+
+    if (error) throw error;
+
+    return NextResponse.json({ offers }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching offers:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.error("Error fetching offers:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
