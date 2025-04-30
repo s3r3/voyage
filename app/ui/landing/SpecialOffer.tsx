@@ -1,9 +1,7 @@
-// Removed unnecessary imports
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import debounce from "lodash.debounce";
 
-// Renamed interface to use PascalCase convention
+// Interface untuk data offers
 interface SpecialOffer {
   id: number;
   title: string;
@@ -12,13 +10,13 @@ interface SpecialOffer {
 }
 
 export default function SpecialOffers() {
-  // Renamed state variables to be more descriptive
+  // State untuk menampung data offers
   const [offersData, setOffersData] = useState<SpecialOffer[]>([]);
   const [filterOption, setFilterOption] = useState<string>("all");
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Removed unnecessary debounce function and refactored logic
+  // Fungsi untuk mengambil data offers berdasarkan filter
   const fetchOffers = async (filterValue: string) => {
     setLoadingStatus(true);
     setErrorMessage(null);
@@ -40,10 +38,9 @@ export default function SpecialOffers() {
 
   useEffect(() => {
     fetchOffers(filterOption);
-    return () => {};
   }, [filterOption]);
 
-  // Combined conditionals to reduce code duplication
+  // Kondisi jika masih loading atau ada error
   if (loadingStatus) {
     return <div className="p-6 text-center">Loading...</div>;
   }
@@ -52,9 +49,7 @@ export default function SpecialOffers() {
     return <div className="p-6 text-center text-red-500">{errorMessage}</div>;
   }
 
-  // Renamed component and removed unnecessary comments
   return (
-    // Updated class names to follow Tailwind CSS conventions
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Special Offers</h1>
 
@@ -92,9 +87,14 @@ export default function SpecialOffers() {
               <Image
                 src={offer.imageUrl}
                 alt={offer.title}
-                fill
+                layout="fill"
+                objectFit="cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover transition-transform duration-300 hover:scale-105"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "/fallback-image.jpg"; // Fallback image jika gambar gagal dimuat
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <h3 className="absolute bottom-4 left-4 text-white text-lg font-semibold">
