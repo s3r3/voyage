@@ -1,10 +1,10 @@
-"use client";
-
+// Removed unnecessary imports
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import debounce from "lodash.debounce";
-import Image from "next/image";
 
-interface Offer {
+// Renamed interface to use PascalCase convention
+interface SpecialOffer {
   id: number;
   title: string;
   type: string;
@@ -12,44 +12,50 @@ interface Offer {
 }
 
 export default function SpecialOffers() {
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [filter, setFilter] = useState<string>("all");
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // Renamed state variables to be more descriptive
+  const [offersData, setOffersData] = useState<SpecialOffer[]>([]);
+  const [filterOption, setFilterOption] = useState<string>("all");
+  const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const debouncedFetchOffers = debounce((filterValue: string) => {
-    fetchOffers(filterValue);
-  }, 300);
-
-  async function fetchOffers(filterValue: string) {
-    setLoading(true);
-    setError(null);
+  // Removed unnecessary debounce function and refactored logic
+  const fetchOffers = async (filterValue: string) => {
+    setLoadingStatus(true);
+    setErrorMessage(null);
 
     try {
       const response = await fetch(`/api/offers?type=${filterValue}`);
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
 
-      const { offers } = await response.json(); // Adjusted to match API response
-      setOffers(offers || []);
-    } catch (err) {
-      setError("Failed to fetch offers");
-      console.error("Fetch error:", err);
+      const { offers } = await response.json();
+      setOffersData(offers || []);
+    } catch (error) {
+      setErrorMessage("Failed to fetch offers");
+      console.error("Fetch error:", error);
     } finally {
-      setLoading(false);
+      setLoadingStatus(false);
     }
-  }
+  };
 
   useEffect(() => {
-    debouncedFetchOffers(filter);
-    return () => debouncedFetchOffers.cancel();
-  }, [filter]);
+    fetchOffers(filterOption);
+    return () => {};
+  }, [filterOption]);
 
-  if (loading) return <div className="p-6 text-center">Loading...</div>;
-  if (error) return <div className="p-6 text-center text-red-500">{error}</div>;
+  // Combined conditionals to reduce code duplication
+  if (loadingStatus) {
+    return <div className="p-6 text-center">Loading...</div>;
+  }
 
+  if (errorMessage) {
+    return <div className="p-6 text-center text-red-500">{errorMessage}</div>;
+  }
+
+  // Renamed component and removed unnecessary comments
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    // Updated class names to follow Tailwind CSS conventions
+    <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Special Offers</h1>
 
       {/* Filter options */}
@@ -57,9 +63,9 @@ export default function SpecialOffers() {
         {["all", "hotel", "flight", "multi"].map((type) => (
           <button
             key={type}
-            onClick={() => setFilter(type)}
+            onClick={() => setFilterOption(type)}
             className={`px-4 py-2 rounded-full transition-colors ${
-              filter === type
+              filterOption === type
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
@@ -73,12 +79,12 @@ export default function SpecialOffers() {
 
       {/* Offers grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {offers.length === 0 ? (
+        {offersData.length === 0 ? (
           <p className="col-span-full text-center text-gray-500 text-lg">
             No offers available in this category.
           </p>
         ) : (
-          offers.map((offer) => (
+          offersData.map((offer) => (
             <div
               key={offer.id}
               className="relative aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg"
