@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/app/lib/prisma"; // Ensure Prisma client is imported
-import bcrypt from "bcryptjs";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function POST(req: Request) {
   try {
@@ -14,38 +19,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // Sign up user with Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
     });
 
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "User with this email already exists" },
-        { status: 409 }
-      );
+    if (error) {
+      throw error;
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the user in the database
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-      },
-    });
-
     return NextResponse.json(
-      { message: "User registered successfully", user },
+      { message: "User registered successfully", user: data.user },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Failed to register user" },
-      { status: 500 }
+      { error: error.message || "Failed to register user" },
+      { status: error.status || 500 }
     );
   }
 }
