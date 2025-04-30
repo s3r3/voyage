@@ -1,59 +1,51 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/app/lib/supabase"; // Ensure this path is correct
+import { prisma } from "@/app/lib/prisma"; // Ensure Prisma client is imported
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { email, password, firstName, lastName } = body;
+    const { email, password, fullName } = await req.json();
 
-    // Validate input fields
-    if (!email || !password || !firstName || !lastName) {
+    // Validate input
+    if (!email || !password || !fullName) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { error: "Email, password, and full name are required" },
         { status: 400 }
       );
     }
 
-    // Sign up user with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
     });
 
-    if (authError) {
-      return NextResponse.json({ error: authError.message }, { status: 400 });
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "User with this email already exists" },
+        { status: 409 }
+      );
     }
 
-    // Insert additional user data into the `users` table
-    const { error: dbError } = await supabase
-      .from("users")
-      .insert({
-        id: authData.user?.id, // Use the user ID from Supabase Auth
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user in the database
+    const user = await prisma.user.create({
+      data: {
         email,
-        firstName, // Use camelCase if your Supabase table columns match
-        lastName,  // Use camelCase if your Supabase table columns match
-      });
-
-    if (dbError) {
-      // Rollback: Delete the user from auth if database insertion fails
-      if (authData.user?.id) {
-        await supabase.auth.admin.deleteUser(authData.user.id);
-      }
-      return NextResponse.json({ error: dbError.message }, { status: 400 });
-    }
+        password: hashedPassword,
+        full_name: fullName,
+      },
+    });
 
     return NextResponse.json(
-      {
-        message: "User registered successfully. Please check your email to confirm.",
-      },
+      { message: "User registered successfully", user },
       { status: 201 }
     );
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
+      { error: "Failed to register user" },
       { status: 500 }
     );
   }

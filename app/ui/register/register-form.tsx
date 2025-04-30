@@ -9,8 +9,7 @@ import { Icon } from "@iconify/react";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    fullName: "", // Changed to fullName
     email: "",
     password: "",
     confirmPassword: "",
@@ -43,8 +42,7 @@ export default function RegisterForm() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
+          fullName: formData.fullName, // Send fullName instead of firstName/lastName
         }),
       });
 
@@ -53,8 +51,7 @@ export default function RegisterForm() {
       if (response.ok) {
         setSuccess(true);
         setFormData({
-          firstName: "",
-          lastName: "",
+          fullName: "", // Reset fullName
           email: "",
           password: "",
           confirmPassword: "",
@@ -76,22 +73,14 @@ export default function RegisterForm() {
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Register</h1>
           <form onSubmit={handleRegister} className="flex flex-col gap-3">
-            <div className="flex gap-3">
-              <LabelInput
-                label="First Name"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-              />
-              <LabelInput
-                label="Last Name"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            {/* Replaced firstName/lastName with fullName */}
+            <LabelInput
+              label="Full Name"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+            />
             <LabelInput
               label="Email"
               type="email"
@@ -125,7 +114,7 @@ export default function RegisterForm() {
             {error && <p className="text-red-500 text-center">{error}</p>}
             {success && (
               <p className="text-green-500 text-center">
-                Check your email to confirm your account!
+                Registration successful! Check your email to confirm your account.
               </p>
             )}
             <Button
@@ -181,8 +170,8 @@ function LabelInput({
 function SocialIcons() {
   const icons = [
     { icon: "logos:facebook", alt: "Facebook" },
-    { icon: "ic:baseline-apple", alt: "Google" }, // Corrected alt text
-    { icon: "flat-color-icons:google", alt: "Apple" }, // Corrected alt text
+    { icon: "ic:baseline-apple", alt: "Apple" }, // Corrected alt text
+    { icon: "flat-color-icons:google", alt: "Google" }, // Corrected alt text
   ];
 
   return (
