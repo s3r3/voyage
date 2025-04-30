@@ -4,12 +4,12 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const { email, password, fullName } = await req.json();
+    const { email, password } = await req.json();
 
     // Validate input
-    if (!email || !password || !fullName) {
+    if (!email || !password) {
       return NextResponse.json(
-        { error: "Email, password, and full name are required" },
+        { error: "Email and password are required" },
         { status: 400 }
       );
     }
@@ -34,7 +34,6 @@ export async function POST(req: Request) {
       data: {
         email,
         password: hashedPassword,
-        full_name: fullName,
       },
     });
 
