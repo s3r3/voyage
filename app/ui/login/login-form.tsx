@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // For redirection after login
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { supabase } from "@/app/lib/supabase";
-import { useSession } from "@/app/lib/auth";
+import { Button } from "components/ui/button";
+import { Checkbox } from "components/ui/checkbox";
+import { Input } from "components/ui/input";
+import { Label } from "components/ui/label";
+import { supabase } from "app/lib/supabase";
+import { useSession } from "app/lib/auth";
 import { Icon } from "@iconify/react";
 
 export default function LoginForm() {
