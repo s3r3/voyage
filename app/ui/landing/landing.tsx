@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useFlightStore } from '../../store/dateFlight'
 import GuestSelector from "../landing/GuestSleector" // Corrected path
 import SpecialOffers from "../landing/SpecialOffer"; // Corrected path
-
+import Explore from "./SectionExplore";
 const FlightDateRangePicker = () => {
   const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } = useFlightStore();
 
@@ -120,6 +120,9 @@ const Landing = () => {
       {/* Special Offer Section */}
       <section className="px-4 pt-20">
         <SpecialOffers/>
+      </section>
+      <section className="px-4 pt-10">
+        <Explore/>
       </section>
     </div>
   );
