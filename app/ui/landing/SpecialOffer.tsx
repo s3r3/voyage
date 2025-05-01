@@ -1,6 +1,5 @@
-import Image from "next/image";
 import { useEffect, useState } from "react";
-
+import Masonry from "react-masonry-css";
 // Interface untuk data offers
 interface SpecialOffer {
   id: number;
@@ -17,6 +16,11 @@ export default function SpecialOffers() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Fungsi untuk mengambil data offers berdasarkan filter
+  const breakpointColumnsObj = {
+    default: 3, // untuk layar besar
+    1024: 2, // untuk layar sedang
+    640: 1, // untuk mobile
+  };
   const fetchOffers = async (filterValue: string) => {
     setLoadingStatus(true);
     setErrorMessage(null);
@@ -73,31 +77,101 @@ export default function SpecialOffers() {
       </div>
 
       {/* Offers grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-5 gap-4 w-full">
         {offersData.length === 0 ? (
           <p className="col-span-full text-center text-gray-500 text-lg">
             No offers available in this category.
           </p>
         ) : (
-          offersData.map((offer) => (
-            <div
-              key={offer.id}
-              className="relative aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg"
-            >
+          <>
+            {/* Kolom 1 – besar */}
+            <div className="row-span-1 col-span-2 relative h-[278px] rounded-xl shadow-lg overflow-hidden">
               <img
-                src={offer.imageUrl}
-                alt={offer.title}
+                src={offersData[0]?.imageUrl}
+                alt={offersData[0]?.title}
                 className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/fallback-image.jpg"; // Fallback image jika gambar gagal dimuat
-                }}
+                onError={(e) =>
+                  ((e.target as HTMLImageElement).src = "/fallback-image.jpg")
+                }
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <h3 className="absolute bottom-4 left-4 text-white text-lg font-semibold">
-                {offer.title}
+                {offersData[0]?.title}
               </h3>
             </div>
-          ))
+
+            {/* Kolom 2 & 3 – atas */}
+            {[2].map((i) => (
+              <div
+                key={i}
+                className="relative h-[278px] rounded-xl shadow-lg overflow-hidden"
+              >
+                <img
+                  src={offersData[i]?.imageUrl}
+                  alt={offersData[i]?.title}
+                  className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                  onError={(e) =>
+                    ((e.target as HTMLImageElement).src = "/fallback-image.jpg")
+                  }
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <h3 className="absolute bottom-4 left-4 text-white text-lg font-semibold">
+                  {offersData[i]?.title}
+                </h3>
+              </div>
+            ))}
+
+            <div className="row-span-1 col-span-2 relative h-[278px] rounded-xl shadow-lg overflow-hidden">
+              <img
+                src={offersData[2]?.imageUrl}
+                alt={offersData[2]?.title}
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) =>
+                  ((e.target as HTMLImageElement).src = "/fallback-image.jpg")
+                }
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <h3 className="absolute bottom-4 left-4 text-white text-lg font-semibold">
+                {offersData[0]?.title}
+              </h3>
+            </div>
+            <div className="row-span-1 col-span-3 relative h-[278px] rounded-xl shadow-lg overflow-hidden">
+              <img
+                src={offersData[3]?.imageUrl}
+                alt={offersData[3]?.title}
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                onError={(e) =>
+                  ((e.target as HTMLImageElement).src = "/fallback-image.jpg")
+                }
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <h3 className="absolute bottom-4 left-4 text-white text-lg font-semibold">
+                {offersData[0]?.title}
+              </h3>
+            </div>
+
+            {/* Kolom 2 & 3 – bawah */}
+
+            {[4, 5].map((i) => (
+              <div
+                key={i}
+                className="relative h-[278px] rounded-xl shadow-lg overflow-hidden col-span-1"
+              >
+                <img
+                  src={offersData[i]?.imageUrl}
+                  alt={offersData[i]?.title}
+                  className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                  onError={(e) =>
+                    ((e.target as HTMLImageElement).src = "/fallback-image.jpg")
+                  }
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <h3 className="absolute bottom-4 left-4 text-white text-lg font-semibold">
+                  {offersData[i]?.title}
+                </h3>
+              </div>
+            ))}
+          </>
         )}
       </div>
     </div>
