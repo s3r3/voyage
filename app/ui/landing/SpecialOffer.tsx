@@ -84,16 +84,12 @@ export default function SpecialOffers() {
               key={offer.id}
               className="relative aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-lg"
             >
-              <Image
+              <img
                 src={offer.imageUrl}
                 alt={offer.title}
-                layout="fill"
-                objectFit="cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover transition-transform duration-300 hover:scale-105"
+                className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    "/fallback-image.jpg"; // Fallback image jika gambar gagal dimuat
+                  (e.target as HTMLImageElement).src = "/fallback-image.jpg"; // Fallback image jika gambar gagal dimuat
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
