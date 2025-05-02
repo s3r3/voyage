@@ -6,6 +6,7 @@ import { Checkbox } from "components/ui/checkbox";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
 import { Icon } from "@iconify/react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,8 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,6 +60,9 @@ export default function RegisterForm() {
           password: "",
           confirmPassword: "",
         });
+        setTimeout(() => {
+          router.push("/login"); // Navigate to the login page
+        }, 2000);
       } else {
         setError(result.error || "Registration failed");
       }

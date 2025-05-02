@@ -12,20 +12,7 @@ export function useSession() {
 
       if (session) {
         const { data: { user } } = await supabase.auth.getUser();
-        // Fetch additional user details from the 'User' table in Supabase
-        const { data: userData, error } = await supabase
-          .from('User')
-          .select('FullName')
-          .eq('id', user?.id)
-          .single();
-
-        if (error) {
-          console.error('Error fetching user details:', error);
-        } else {
-          setUser({ ...user, FullName: userData?.FullName });
-        }
-      } else {
-        setUser(null);
+        setUser(user);
       }
     };
 
@@ -34,18 +21,8 @@ export function useSession() {
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
       setSession(session);
       if (session) {
-        supabase.auth.getUser().then(async ({ data: { user } }) => {
-          const { data: userData, error } = await supabase
-            .from('User')
-            .select('FullName')
-            .eq('id', user?.id)
-            .single();
-
-          if (error) {
-            console.error('Error fetching user details:', error);
-          } else {
-            setUser({ ...user, FullName: userData?.FullName });
-          }
+        supabase.auth.getUser().then(({ data: { user } }) => {
+          setUser(user);
         });
       } else {
         setUser(null);
@@ -59,7 +36,6 @@ export function useSession() {
 
   return { session, user };
 }
-
 export async function logout() {
   await supabase.auth.signOut();
 }

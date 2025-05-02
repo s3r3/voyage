@@ -11,10 +11,10 @@ import { useFlightStore } from "../../store/dateFlight";
 import GuestSelector from "../landing/GuestSleector"; // Corrected path
 import SpecialOffers from "../landing/SpecialOffer"; // Corrected path
 import Explore from "./SectionExplore";
-import banner2 from "public/image.png"
+import banner2 from "public/image.png";
 import { useSession } from "app/lib/auth";
-import UserInfo from "../login/user-info";
-import LogoutButton from "../logout/logout-button";
+import UserDropdown from "./userDropdown";
+import Link from "next/link"; // Corrected path
 const FlightDateRangePicker = () => {
   const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } =
     useFlightStore();
@@ -58,18 +58,10 @@ const FlightDateRangePicker = () => {
 };
 
 const Landing = () => {
-  const {session, user} = useSession(); // Use the updated useSession hook
+  const { session, user } = useSession(); // Use the updated useSession hook
+
   return (
     <div className="container mx-auto">
-      <h1>Welcome to the Landing Page</h1>
-      {session && user ? (
-        <div>
-          <UserInfo user={user} />
-          <LogoutButton />
-        </div>
-      ) : (
-        <p>Please log in to see your profile.</p>
-      )}
       {/* Header Section */}
       <header className="flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
@@ -93,12 +85,22 @@ const Landing = () => {
         </div>
 
         <div className="flex gap-4">
-          <Button className="w-[189px] h-[40px] border border-[#07689F] text-[#07689F] hover:bg-[#07689F] hover:text-white transition-colors">
-            Signin
-          </Button>
-          <Button className="w-[189px] h-[40px] border border-[#07689F] text-[#07689F] hover:bg-[#07689F] hover:text-white transition-colors">
-            Register
-          </Button>
+          {!session || !user ? (
+            <>
+              <Link href="/register">
+                <Button className="w-[189px] h-[40px] border border-[#07689F] text-[#07689F] hover:bg-[#07689F] hover:text-white transition-colors">
+                  Signin
+                </Button>
+              </Link>
+              <Link href="/login">
+              <Button className="w-[189px] h-[40px] border border-[#07689F] text-[#07689F] hover:bg-[#07689F] hover:text-white transition-colors">
+                LogIn
+              </Button>
+              </Link>
+            </>
+          ) : (
+            <UserDropdown user={user} />
+          )}
         </div>
       </header>
 
@@ -233,9 +235,7 @@ const Landing = () => {
               </li>
             </ul>
           </div>
-          <p className="text-center mb-2">
-            Voyage 2025. All rights reserved.
-          </p>
+          <p className="text-center mb-2">Voyage 2025. All rights reserved.</p>
           &#169;
           <p className="text-center">2025 Voyage.</p>
         </div>
