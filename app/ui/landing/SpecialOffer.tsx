@@ -71,7 +71,7 @@ const SpecialOffers = () => {
       <div className="flex gap-4 mb-8">{filterButtons}</div>
       <div className="grid grid-cols-5 sm:grid-cols-2 md:grid-cols-5 gap-4">
         {offersData.length === 0 ? (
-          <p className="col-span-full text-center text-gray-500 text-lg">No offers available in this category.</p>
+          <p className="col-span-3 text-center text-gray-500 text-lg">No offers available in this category.</p>
         ) : (
           <>
             {renderOffer(offersData[0], 0, 2)}
