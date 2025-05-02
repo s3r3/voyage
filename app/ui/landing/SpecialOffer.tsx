@@ -69,7 +69,7 @@ const SpecialOffers = () => {
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Special Offers</h1>
       <div className="flex gap-4 mb-8">{filterButtons}</div>
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         {offersData.length === 0 ? (
           <p className="col-span-full text-center text-gray-500 text-lg">No offers available in this category.</p>
         ) : (
