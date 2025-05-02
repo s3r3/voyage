@@ -15,6 +15,7 @@ const SpecialOffers = () => {
 
   const fetchOffers = async () => {
     try {
+      setLoading(true); // make sure loading resets on filter change
       const response = await fetch(`/api/offers?type=${filterOption}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const { offers } = await response.json();
@@ -34,11 +35,21 @@ const SpecialOffers = () => {
   if (loading) return <div className="p-6 text-center">Loading...</div>;
   if (error) return <div className="p-6 text-center text-red-500">{error}</div>;
 
+  // Mapping colSpan values to Tailwind classes (must be known ahead of time)
+  const colSpanClasses: Record<number, string> = {
+    1: "col-span-1",
+    2: "col-span-2",
+    3: "col-span-3",
+  };
+
   const renderOffer = (offer: SpecialOffer | undefined, index: number, colSpan: number) => {
     if (!offer) return null;
 
     return (
-      <div key={index} className={`relative col-span-${colSpan} h-[278px] shadow-lg overflow-hidden`}>
+      <div
+        key={index}
+        className={`relative ${colSpanClasses[colSpan] || "col-span-1"} h-[278px] shadow-lg overflow-hidden`}
+      >
         <img
           src={offer.imageUrl}
           alt={offer.title}
@@ -58,7 +69,9 @@ const SpecialOffers = () => {
       key={type}
       onClick={() => setFilterOption(type)}
       className={`px-4 py-2 rounded-full transition-colors ${
-        filterOption === type ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        filterOption === type
+          ? "bg-blue-600 text-white"
+          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
       }`}
     >
       {type === "multi" ? "Multi-City" : type.charAt(0).toUpperCase() + type.slice(1)}
@@ -69,9 +82,12 @@ const SpecialOffers = () => {
     <div className="max-w-7xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Special Offers</h1>
       <div className="flex gap-4 mb-8">{filterButtons}</div>
+
       <div className="grid grid-cols-5 sm:grid-cols-2 md:grid-cols-5 gap-4">
         {offersData.length === 0 ? (
-          <p className="col-span-3 text-center text-gray-500 text-lg">No offers available in this category.</p>
+          <p className="col-span-full text-center text-gray-500 text-lg">
+            No offers available in this category.
+          </p>
         ) : (
           <>
             {renderOffer(offersData[0], 0, 2)}
