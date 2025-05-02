@@ -1,43 +1,54 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { email, password } = await req.json();
+    const { FullName, email, password } = await request.json();
 
     // Validate input
-    if (!email || !password) {
+    if (!email || !password || !FullName) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Email, password, and FullName are required" },
         { status: 400 }
       );
     }
 
-    // Sign up user with Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
+    // Step 1: Sign up the user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    if (error) {
-      throw error;
+    if (authError) {
+      throw authError;
+    }
+
+    // Menggunakan ID yang baru dibuat untuk foreign key
+    const { error: insertError } = await supabase
+      .from("User")
+      .insert([{ id: authData.user?.id, email, FullName }]);
+
+    if (insertError) {
+      throw insertError;
     }
 
     return NextResponse.json(
-      { message: "User registered successfully", user: data.user },
+      { message: "User registered successfully", user: authData.user },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Registration error:", error);
+    console.error("Registration error:", error); // tetap log di server
     return NextResponse.json(
-      { error: error.message || "Failed to register user" },
-      { status: error.status || 500 }
+      {
+        error: "Registration failed",
+        detail: error?.message || JSON.stringify(error),
+      },
+      { status: 500 }
     );
   }
 }

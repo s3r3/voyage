@@ -9,6 +9,7 @@ import { Icon } from "@iconify/react";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
+    FullName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -39,16 +40,19 @@ export default function RegisterForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          FullName: formData.FullName,
           email: formData.email,
           password: formData.password,
-        }), // Removed fullName
+        }),
       });
 
       const result = await response.json();
+      console.log("Register response:", result);
 
       if (response.ok) {
         setSuccess(true);
         setFormData({
+          FullName: "",
           email: "",
           password: "",
           confirmPassword: "",
@@ -70,13 +74,21 @@ export default function RegisterForm() {
         <div className="flex flex-col gap-3 w-[393px]">
           <h1 className="text-xl font-bold">Register</h1>
           <form onSubmit={handleRegister} className="flex flex-col gap-3">
-            {/* Removed Full Name Input */}
+            <LabelInput
+              label="Full Name"
+              type="text"
+              name="FullName"
+              value={formData.FullName}
+              onChange={handleChange}
+              required
+            />
             <LabelInput
               label="Email"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
+              autoComplete="email"
               required
             />
             <LabelInput
@@ -85,6 +97,7 @@ export default function RegisterForm() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              autoComplete="new-password"
               required
             />
             <LabelInput
@@ -93,6 +106,7 @@ export default function RegisterForm() {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
+              autoComplete="new-password"
               required
             />
             <div className="flex items-center gap-2">
@@ -104,7 +118,8 @@ export default function RegisterForm() {
             {error && <p className="text-red-500 text-center">{error}</p>}
             {success && (
               <p className="text-green-500 text-center">
-                Registration successful! Check your email to confirm your account.
+                Registration successful! Check your email to confirm your
+                account.
               </p>
             )}
             <Button
@@ -125,7 +140,7 @@ export default function RegisterForm() {
   );
 }
 
-// Reusable LabelInput Component
+// ✅ LabelInput: Input + Label reusable component
 function LabelInput({
   label,
   type = "text",
@@ -133,6 +148,7 @@ function LabelInput({
   value,
   onChange,
   required = false,
+  autoComplete,
 }: {
   label: string;
   type?: string;
@@ -140,23 +156,26 @@ function LabelInput({
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
+  autoComplete?: string;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <Label>{label}</Label>
+      <Label htmlFor={name}>{label}</Label>
       <Input
         type={type}
         name={name}
+        id={name}
         value={value}
         onChange={onChange}
         className="bg-white"
         required={required}
+        autoComplete={autoComplete}
       />
     </div>
   );
 }
 
-// Social Icons Component
+// ✅ Social login placeholder (Facebook, Google, Apple)
 function SocialIcons() {
   const icons = [
     { icon: "logos:facebook", alt: "Facebook" },

@@ -1,26 +1,65 @@
 import { supabase } from './supabase';
 import { useState, useEffect } from 'react';
 
-// Hook untuk mengelola session
 export function useSession() {
   const [session, setSession] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Mengambil session yang sudah ada saat aplikasi dimulai
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-    });
-    // Remove the undefined 'currentSession' line as it is unnecessary
+    const getSessionAndUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
 
-    // Menangani perubahan status autentikasi
+      if (session) {
+        const { data: { user } } = await supabase.auth.getUser();
+        // Fetch additional user details from the 'User' table in Supabase
+        const { data: userData, error } = await supabase
+          .from('User')
+          .select('FullName')
+          .eq('id', user?.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user details:', error);
+        } else {
+          setUser({ ...user, FullName: userData?.FullName });
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    getSessionAndUser();
+
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
-      setSession(session); // Update session jika terjadi perubahan
+      setSession(session);
+      if (session) {
+        supabase.auth.getUser().then(async ({ data: { user } }) => {
+          const { data: userData, error } = await supabase
+            .from('User')
+            .select('FullName')
+            .eq('id', user?.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching user details:', error);
+          } else {
+            setUser({ ...user, FullName: userData?.FullName });
+          }
+        });
+      } else {
+        setUser(null);
+      }
     });
 
     return () => {
-      authListener?.subscription.unsubscribe(); // Membersihkan listener jika komponen di-unmount
+      authListener?.subscription.unsubscribe();
     };
   }, []);
 
-  return session;
+  return { session, user };
+}
+
+export async function logout() {
+  await supabase.auth.signOut();
 }

@@ -15,7 +15,7 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const session = useSession();
+  const { session, user } = useSession(); // Use the updated useSession hook
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -30,7 +30,7 @@ export default function LoginForm() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/dashboard"); // Redirect to protected route
+      router.push("/"); // Redirect to protected route
     }
 
     setLoading(false);
@@ -41,10 +41,10 @@ export default function LoginForm() {
     router.push("/login"); // Redirect to login after logout
   };
 
-  if (session) {
+  if (session && user) {
     return (
       <div className="text-center">
-        <p>Welcome, {session.user.email}</p>
+        <p>Welcome, {user.user_metadata?.full_name || user.email}</p>
         <Button onClick={handleLogout} className="mt-4">
           Logout
         </Button>
