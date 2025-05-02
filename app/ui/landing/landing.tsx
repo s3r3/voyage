@@ -5,15 +5,17 @@ import React from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { Input } from "../../../components/ui/input";
-import { Button } from  "../../../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useFlightStore } from '../../store/dateFlight'
-import GuestSelector from "../landing/GuestSleector" // Corrected path
+import { useFlightStore } from "../../store/dateFlight";
+import GuestSelector from "../landing/GuestSleector"; // Corrected path
 import SpecialOffers from "../landing/SpecialOffer"; // Corrected path
 import Explore from "./SectionExplore";
+import banner2 from "public/banner2.png";
 const FlightDateRangePicker = () => {
-  const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } = useFlightStore();
+  const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } =
+    useFlightStore();
 
   return (
     <div className="flex items-center gap-2 p-2 rounded h-[56px]">
@@ -59,7 +61,13 @@ const Landing = () => {
       {/* Header Section */}
       <header className="flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
-          <Image src="/Asset2.png" alt="logo" width={50} height={50} className="w-10 h-10" />
+          <Image
+            src="/Asset2.png"
+            alt="logo"
+            width={50}
+            height={50}
+            className="w-10 h-10"
+          />
           <Icon icon="ri:question-line" className="text-xl" />
           <Icon icon="emojione:flag-for-indonesia" className="text-xl" />
         </div>
@@ -84,23 +92,37 @@ const Landing = () => {
 
       {/* Navigation Buttons */}
       <nav className="flex justify-center gap-2 py-4">
-        {["Trip", "% Deals", "Hotel", "Flight", "Apartment", "Camper"].map((label, index) => (
-          <button
-            key={index}
-            className="w-[121px] h-[40px] rounded-full border border-gray-300 opacity-75 hover:bg-[#07689F] hover:text-white hover:opacity-100 transition-colors"
-          >
-            {label}
-          </button>
-        ))}
+        {["Trip", "% Deals", "Hotel", "Flight", "Apartment", "Camper"].map(
+          (label, index) => (
+            <button
+              key={index}
+              className="w-[121px] h-[40px] rounded-full border border-gray-300 opacity-75 hover:bg-[#07689F] hover:text-white hover:opacity-100 transition-colors"
+            >
+              {label}
+            </button>
+          )
+        )}
       </nav>
 
       {/* Banner Section */}
       <section className="pt-10 relative">
-        <Image src="/banner.png" alt="Banner" width={1440} height={500} className="w-full h-auto" />
+        <Image
+          src="/banner.png"
+          alt="Banner"
+          width={1440}
+          height={500}
+          className="w-full h-auto"
+        />
         <div className="flex justify-center  absolute bottom-[-28px] left-1/2 transform -translate-x-1/2 w-full max-w-[1200px]">
           <div className="flex items-center bg-white p-4 w-[327px] h-[56px]">
-            <Icon icon="tabler:building" className="w-6 h-6 text-[#07689F] mr-2" />
-            <Input placeholder="Where are you going?" className="border-none focus:ring-0 text-sm" />
+            <Icon
+              icon="tabler:building"
+              className="w-6 h-6 text-[#07689F] mr-2"
+            />
+            <Input
+              placeholder="Where are you going?"
+              className="border-none focus:ring-0 text-sm"
+            />
           </div>
 
           <div className="flex items-center bg-white p-4 w-[327px] h-[56px]">
@@ -119,11 +141,93 @@ const Landing = () => {
 
       {/* Special Offer Section */}
       <section className="px-4 pt-20">
-        <SpecialOffers/>
+        <SpecialOffers />
       </section>
       <section className="px-4 pt-10">
-        <Explore/>
+        <Explore />
       </section>
+      <section className=" pt-10 ">
+        <Image src={banner2} alt="banner bottom " className="h-[411px]" />
+      </section>
+      <section className="px-4 pt-10">
+        <div className="flex flex-col w-[704px] px-10 gap-2">
+          <h1 className="font-bold text-[#07689F] text-xl">
+            Go Further With The Voyage App
+          </h1>
+          <p>
+            Enjoy savings on chosen hotels and flights when you book through the
+            Voyage website. Additionally, earn One Key Cash for every booking
+            made through the app.
+          </p>
+          <p>Secured By Europe GTP</p>
+        </div>
+      </section>
+      <footer className="mt-10">
+        <div className="bg-black py-4 px-4 text-lg text-gray-600">
+          <div className="flex gap-4">
+            <div className="w-[240px] text-white">
+              <h2 className="text-white font-bold text-lg mb-2">About Us</h2>
+              <ul>
+                <li>Learn More About Us</li>
+                <li>About Our Team</li>
+                <li>Our Technology</li>
+              </ul>
+            </div>
+            <div className="w-[240px] text-white">
+              <h2 className="text-white font-bold text-lg mb-2">Support</h2>
+              <ul>
+                <li>Contact Us</li>
+                <li>FAQ</li>
+                <li>Terms of Service</li>
+              </ul>
+            </div>
+            <div className="w-[240px] text-white">
+              <h2 className="text-white font-bold text-lg mb-2">Legal</h2>
+              <ul>
+                <li>Privacy Policy</li>
+                <li>Cookie Policy</li>
+                <li>Legal Documents</li>
+              </ul>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <ul className="flex gap-2 my-4">
+              <li>
+                <a
+                  href="https://www.facebook.com/easyset24"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="ri-facebook-box-line"></i>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/easyset24"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="ri-instagram-line"></i>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.linkedin.com/company/easyset24"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="ri-linkedin-box-line"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <p className="text-center mb-2">
+            Voyage 2025. All rights reserved.
+          </p>
+          &#169;
+          <p className="text-center">2025 Voyage.</p>
+        </div>
+      </footer>
     </div>
   );
 };
