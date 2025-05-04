@@ -1,124 +1,18 @@
-// app/ui/landing/landing.tsx
 "use client";
 import React from "react";
 import Image from "next/image";
-import { Icon } from "@iconify/react";
-import { Input } from "../../../components/ui/input";
-import { Button } from "../../../components/ui/button";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useFlightStore } from "../../store/dateFlight";
-import GuestSelector from "../landing/GuestSleector"; // Corrected path
-import SpecialOffers from "../landing/SpecialOffer"; // Corrected path
+import SpecialOffers from "../landing/SpecialOffer";
 import Explore from "./SectionExplore";
-import banner2 from "public/image.png";
-import { useSession } from "app/lib/auth";
-import UserDropdown from "./userDropdown";
-import Link from "next/link"; // Corrected path
-const FlightDateRangePicker = () => {
-  const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } =
-    useFlightStore();
-
-  return (
-    <div className="flex items-center gap-2 p-2 rounded h-[56px]">
-      <Icon icon="tabler:calendar" className="w-6 h-6 text-[#07689F]" />
-      <div className="flex gap-2">
-        <div className="flex flex-col">
-          <label className="text-xs font-medium text-gray-600">Check-in</label>
-          <DatePicker
-            selected={checkInDate}
-            onChange={setCheckInDate}
-            selectsStart
-            startDate={checkInDate}
-            endDate={checkOutDate}
-            placeholderText="Select check-in"
-            dateFormat="dd/MM/yyyy"
-            minDate={new Date()}
-            className="text-sm px-2 py-1 border-none focus:outline-none w-full"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-xs font-medium text-gray-600">Check-out</label>
-          <DatePicker
-            selected={checkOutDate}
-            onChange={setCheckOutDate}
-            selectsEnd
-            startDate={checkInDate}
-            endDate={checkOutDate}
-            placeholderText="Select check-out"
-            dateFormat="dd/MM/yyyy"
-            minDate={checkInDate || new Date()}
-            className="text-sm px-2 py-1 border-none focus:outline-none w-full"
-            disabled={!checkInDate}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
+import banner1 from "public/banner1.png";
+import SearchForm from "./components/SearchForm";
+import Header from "../shared/Header";
+import Footer from "../shared/Footer";
+import Navigation from "./components/Navigation";
 const Landing = () => {
-  const { session, user } = useSession(); // Use the updated useSession hook
-
   return (
     <div className="container mx-auto">
-      {/* Header Section */}
-      <header className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-4">
-          <Image
-            src="/Asset2.png"
-            alt="logo"
-            width={50}
-            height={50}
-            className="w-10 h-10"
-          />
-          <Icon icon="ri:question-line" className="text-xl" />
-          <Icon icon="emojione:flag-for-indonesia" className="text-xl" />
-        </div>
-
-        <div className="relative w-[605px]">
-          <Input className="pl-10 pr-4 py-2 w-full" />
-          <Icon
-            icon="mynaui:search"
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-          />
-        </div>
-
-        <div className="flex gap-4">
-          {!session || !user ? (
-            <>
-              <Link href="/register">
-                <Button className="w-[189px] h-[40px] border border-[#07689F] text-[#07689F] hover:bg-[#07689F] hover:text-white transition-colors">
-                  Signin
-                </Button>
-              </Link>
-              <Link href="/login">
-              <Button className="w-[189px] h-[40px] border border-[#07689F] text-[#07689F] hover:bg-[#07689F] hover:text-white transition-colors">
-                LogIn
-              </Button>
-              </Link>
-            </>
-          ) : (
-            <UserDropdown user={user} />
-          )}
-        </div>
-      </header>
-
-      {/* Navigation Buttons */}
-      <nav className="flex justify-center gap-2 py-4">
-        {["Trip", "% Deals", "Hotel", "Flight", "Apartment", "Camper"].map(
-          (label, index) => (
-            <button
-              key={index}
-              className="w-[121px] h-[40px] rounded-full border border-gray-300 opacity-75 hover:bg-[#07689F] hover:text-white hover:opacity-100 transition-colors"
-            >
-              {label}
-            </button>
-          )
-        )}
-      </nav>
-
-      {/* Banner Section */}
+      <Header />
+      <Navigation />
       <section className="pt-10 relative">
         <Image
           src="/banner.png"
@@ -127,33 +21,10 @@ const Landing = () => {
           height={500}
           className="w-full h-auto"
         />
-        <div className="flex justify-center  absolute bottom-[-28px] left-1/2 transform -translate-x-1/2 w-full max-w-[1200px]">
-          <div className="flex items-center bg-white p-4 w-[327px] h-[56px]">
-            <Icon
-              icon="tabler:building"
-              className="w-6 h-6 text-[#07689F] mr-2"
-            />
-            <Input
-              placeholder="Where are you going?"
-              className="border-none focus:ring-0 text-sm"
-            />
-          </div>
-
-          <div className="flex items-center bg-white p-4 w-[327px] h-[56px]">
-            <FlightDateRangePicker />
-          </div>
-
-          <div className="flex items-center bg-white  p-4 w-[327px] h-[56px]">
-            <GuestSelector />
-          </div>
-
-          <Button className="w-[127px] h-[56px] bg-[#07689F] text-white rounded-none">
-            Search
-          </Button>
-        </div>
+        <div className="bottom-[28px] left-1/2 transform -translate-x-1/2 absolute  w-full max-w-[1200px] flex justify-center"><SearchForm /></div>
+        
       </section>
 
-      {/* Special Offer Section */}
       <section className="px-4 pt-20">
         <SpecialOffers />
       </section>
@@ -161,8 +32,9 @@ const Landing = () => {
         <Explore />
       </section>
       <section className=" pt-10 ">
-        <Image src={banner2} alt="banner bottom " className="h-[411px]" />
+        <Image src={banner1} alt="banner bottom " className="h-[411px]" />
       </section>
+
       <section className="px-4 pt-10">
         <div className="flex flex-col w-[704px] px-10 gap-2">
           <h1 className="font-bold text-[#07689F] text-xl">
@@ -176,70 +48,8 @@ const Landing = () => {
           <p>Secured By Europe GTP</p>
         </div>
       </section>
-      <footer className="mt-10">
-        <div className="bg-black py-4 px-4 text-lg text-gray-600">
-          <div className="flex gap-4">
-            <div className="w-[240px] text-white">
-              <h2 className="text-white font-bold text-lg mb-2">About Us</h2>
-              <ul>
-                <li>Learn More About Us</li>
-                <li>About Our Team</li>
-                <li>Our Technology</li>
-              </ul>
-            </div>
-            <div className="w-[240px] text-white">
-              <h2 className="text-white font-bold text-lg mb-2">Support</h2>
-              <ul>
-                <li>Contact Us</li>
-                <li>FAQ</li>
-                <li>Terms of Service</li>
-              </ul>
-            </div>
-            <div className="w-[240px] text-white">
-              <h2 className="text-white font-bold text-lg mb-2">Legal</h2>
-              <ul>
-                <li>Privacy Policy</li>
-                <li>Cookie Policy</li>
-                <li>Legal Documents</li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            <ul className="flex gap-2 my-4">
-              <li>
-                <a
-                  href="https://www.facebook.com/easyset24"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="ri-facebook-box-line"></i>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.instagram.com/easyset24"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="ri-instagram-line"></i>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.linkedin.com/company/easyset24"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <i className="ri-linkedin-box-line"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <p className="text-center mb-2">Voyage 2025. All rights reserved.</p>
-          &#169;
-          <p className="text-center">2025 Voyage.</p>
-        </div>
-      </footer>
+
+      <Footer />
     </div>
   );
 };
