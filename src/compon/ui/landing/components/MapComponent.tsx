@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -9,52 +9,88 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+// Import tipe Hotel dari file tipe yang dibagikan
+import { Hotel } from "app/api/types";
+import * as Leaflet from "leaflet"; // Import Leaflet secara eksplisit
 
-// Import the Hotel type from the shared types file
-import { Hotel } from "app/api/types"; 
+// Dynamic import untuk Leaflet dan terapkan fix
+let L: typeof Leaflet | undefined;
 
-// Fix for missing marker icons
-(L.Icon.Default.prototype as any)._getIconUrl = undefined;
+if (typeof window !== "undefined") {
+  import("leaflet")
+    .then((leaflet) => {
+      L = leaflet;
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "leaflet/images/marker-icon-2x.png",
-  iconUrl: "leaflet/images/marker-icon.png",
-  shadowUrl: "leaflet/images/marker-shadow.png",
-});
+      // Hanya terapkan fix setelah Leaflet dimuat
+      leaflet.Icon.Default.mergeOptions({
+        iconUrl: "/images/marker-icon.png",
+        iconRetinaUrl: "/images/marker-icon-2x.png",
+        shadowUrl: "/images/marker-shadow.png",
+      });
+    })
+    .catch((err) => console.error("Gagal memuat Leaflet:", err));
+}
 
-// New component to handle map centering when center prop changes
+// Komponen untuk menangani perubahan pusat peta
 interface ChangeViewProps {
-  center: [number, number] | null; // Allow center to be null initially
+  center: [number, number] | null; // Izinkan pusat menjadi null awalnya
   zoom: number;
 }
 
 const ChangeView: React.FC<ChangeViewProps> = ({ center, zoom }) => {
   const map = useMapEvents({});
-  // useEffect to recenter/rezoom when center prop changes
+  // useEffect untuk memusatkan ulang peta saat properti center berubah
   useEffect(() => {
     if (center) {
       map.setView(center, zoom);
     }
   }, [center, zoom, map]);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
-// Interface for MapComponent props
+// Antarmuka untuk properti MapComponent
 interface MapComponentProps {
-  center: [number, number] | null; // Allow center to be null initially
+  center: [number, number] | null; // Izinkan pusat menjadi null awalnya
   hotels: Hotel[];
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ center, hotels }) => {
-  // Ensure hotels is always an array, default to empty array if null/undefined
+  const [leafletLoaded, setLeafletLoaded] = useState(false);
+
+  useEffect(() => {
+    if (typeof L !== "undefined") {
+      setLeafletLoaded(true);
+    } else {
+      const checkLeaflet = setInterval(() => {
+        if (typeof L !== "undefined") {
+          setLeafletLoaded(true);
+          clearInterval(checkLeaflet);
+        }
+      }, 50);
+
+      return () => clearInterval(checkLeaflet);
+    }
+  }, []);
+
   const validHotels = hotels || [];
+
+  // Jika Leaflet belum dimuat, tampilkan status loading
+  if (!leafletLoaded) {
+    return <div>Memuat peta...</div>;
+  }
+
+  // Ikon kustom untuk marker
+  const customIcon = new L.Icon({
+    iconUrl: "/images/marker-icon.png",
+    iconRetinaUrl: "/images/marker-icon-2x.png",
+    shadowUrl: "/images/marker-shadow.png",
+  });
 
   return (
     <MapContainer
-      center={center || [0, 0]} // Initial center, default to [0, 0] if center is null
-      zoom={13} // Initial zoom level
+      center={center || [0, 0]} // Pusat awal, default ke [0, 0] jika pusat null
+      zoom={13} // Tingkat zoom awal
       style={{ height: "100%", width: "100%" }}
       scrollWheelZoom={false}
     >
@@ -65,30 +101,31 @@ const MapComponent: React.FC<MapComponentProps> = ({ center, hotels }) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      {/* Marker for City (Center) - Optional, display only if center is provided */}
+      {/* Marker untuk Kota (Pusat) */}
       {center && (
-        <Marker position={center}>
+        <Marker position={center} icon={customIcon}>
           <Popup>
-            {/* Add city name or other relevant info here */}
-            City Location
+            Lokasi Kota
           </Popup>
         </Marker>
       )}
 
-      {/* Markers for Hotels */}
+      {/* Marker untuk Hotel */}
       {validHotels.map(
         (hotel) =>
-          // Ensure latitude and longitude are valid numbers before creating marker
           typeof hotel.latitude === "number" &&
           typeof hotel.longitude === "number" && (
-            <Marker key={hotel.id} position={[hotel.latitude, hotel.longitude]}>
+            <Marker
+              key={hotel.id}
+              position={[hotel.latitude, hotel.longitude]}
+              icon={customIcon} // Gunakan ikon kustom di sini
+            >
               <Popup>
                 <div>
                   <h3 className="font-semibold">{hotel.name}</h3>
                   <p>{hotel.address}</p>
-                  {/* Add other hotel info if needed */}
                   <p>Rating: {hotel.rating}</p>
-                  <p>Price: ${hotel.price_per_night}</p>
+                  <p>Harga: ${hotel.price_per_night}</p>
                 </div>
               </Popup>
             </Marker>
@@ -99,3 +136,4 @@ const MapComponent: React.FC<MapComponentProps> = ({ center, hotels }) => {
 };
 
 export default MapComponent;
+

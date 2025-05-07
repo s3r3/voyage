@@ -1,142 +1,186 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-// Import komponen-komponen UI yang dibutuhkan (misalnya, HotelCard)
-// import HotelCard from './HotelCard'; // Contoh
-
-interface Hotel {
-  id: string;
-  name: string;
-  description: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  rating: number;
-  price_per_night: number;
-  discount_percentage: number;
-  vip_available: boolean;
-  hotel_images: { image_url: string }[];
-  hotel_services: { services: { name: string } }[];
-}
-
-interface SearchResultsData {
-    hotels: Hotel[];
-    city: {
-        id: string;
-        name: string;
-        description: string;
-        latitude: number;
-        longitude: number;
-    } | null; // Bisa null jika tidak ada kota yang cocok
-}
-
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import MapComponent from "@/compon/ui/landing/components/MapComponentWrapper";
+import { Hotel, HotelSearchResult } from "app/api/types"; // Adjust the import path as necessary
 
 function SearchResultsPage() {
-    const searchParams = useSearchParams();
-    const [searchResults, setSearchResults] = useState<SearchResultsData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const [searchResults, setSearchResults] = useState<HotelSearchResult>({
+    hotels: [],
+    city: null,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const location = searchParams.get('location') || '';
-        const checkIn = searchParams.get('checkIn') || '';
-        const checkOut = searchParams.get('checkOut') || '';
-        const guests = searchParams.get('guests') || '';
-        const rooms = searchParams.get('rooms') || '';
-        const vip = searchParams.get('vip') || '';
+  const searchParams = useSearchParams();
+  const location = searchParams.get("location"); // e.g., "Jakarta" or "Semarang"
+  const adults = searchParams.get("adults");
+  const rooms = searchParams.get("rooms");
+  const children = searchParams.get("children");
+  const checkin = searchParams.get("checkin");
+  const checkout = searchParams.get("checkout");
 
-        const fetchResults = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                // Membangun URL API dengan parameter dari URL
-                const apiUrl = `/api/hotelsearch?${searchParams.toString()}`; // Menggunakan semua param
+  useEffect(() => {
+    const fetchHotels = async () => {
+      if (!location) {
+        setError("Please provide a location for the search.");
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setError(null);
 
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status}`);
-                }
-                const data: SearchResultsData = await response.json();
-                setSearchResults(data);
-            } catch (err) {
-                console.error("Failed to fetch search results:", err);
-                setError("Failed to load search results.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (location) { // Hanya fetch jika lokasi ada
-            fetchResults();
-        } else {
-            setLoading(false); // Tidak ada lokasi untuk dicari
-            // Optionally, set an error or message
+      try {
+        const query = new URLSearchParams({
+          location: location,
+          ...(adults && { adults }), // Only add if not null/undefined
+          ...(rooms && { rooms }),
+          ...(children && { children }),
+          ...(checkin && { checkin }),
+          ...(checkout && { checkout }),
+        }).toString();
+        const response = await fetch(`/api/hotelsearch?${query}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Failed to fetch search results"
+          );
         }
 
-    }, [searchParams]); // Bergantung pada searchParams agar fetch ulang jika URL berubah
+        const data: HotelSearchResult = await response.json();
+        setSearchResults(data);
+      } catch (err: any) {
+        console.error("Error fetching search results:", err);
+        setError(err.message || "An unexpected error occurred.");
+        setSearchResults({ hotels: [], city: null });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (loading) {
-        return <div>Loading results...</div>;
-    }
+    fetchHotels();
+  }, [location, adults, rooms, children, checkin, checkout]);
+  const mapCenter: [number, number] | null = searchResults.city
+    ? [searchResults.city.latitude, searchResults.city.longitude]
+    : null;
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
-    if (!searchResults || searchResults.hotels.length === 0) {
-        return <div>No hotels found for your search criteria.</div>;
-    }
-
+  if (loading) {
     return (
-        <div className="container mx-auto p-4">
-            {/* Tampilkan info kota jika ada */}
-            {searchResults.city && (
-                <div>
-                    <h2>Hotels in {searchResults.city.name}</h2>
-                    <p>{searchResults.city.description}</p>
-                    {/* Mungkin tampilkan peta di sini, memusatkan di kota */}
-                    {/* <MapComponent center={{lat: searchResults.city.latitude, lng: searchResults.city.longitude}} hotels={searchResults.hotels} /> */}
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {searchResults.hotels.map(hotel => (
-                    // Render komponen kartu hotel untuk setiap hotel
-                    // <HotelCard key={hotel.id} hotel={hotel} /> // Anda perlu membuat komponen HotelCard
-                    <div key={hotel.id} className="border p-4 rounded shadow">
-                        <h3>{hotel.name}</h3>
-                        <p>{hotel.address}</p>
-                        <p>Rating: {hotel.rating}</p>
-                        <p>Price: ${hotel.price_per_night.toFixed(2)}</p>
-                        {/* Tampilkan gambar */}
-                        <div className="flex overflow-x-auto space-x-2 mt-2">
-                            {hotel.hotel_images.map((img, index) => (
-                                <img key={index} src={img.image_url} alt={`Image of ${hotel.name}`} className="w-32 h-auto object-cover rounded" />
-                            ))}
-                        </div>
-                        {/* Tampilkan layanan */}
-                        <div className="mt-2">
-                            <strong>Services:</strong>
-                            <ul>
-                                {hotel.hotel_services.map((service, index) => (
-                                    <li key={index}>- {service.services.name}</li>
-                                ))}
-                            </ul>
-                        </div>
-                         {/* Tampilkan info lain seperti deskripsi, VIP, diskon */}
-                         <p className="text-sm mt-2">{hotel.description.substring(0, 100)}...</p>
-                         {hotel.discount_percentage > 0 && (
-                             <p className="text-green-600">Discount: {hotel.discount_percentage}%</p>
-                         )}
-                         {hotel.vip_available && (
-                              <p className="text-blue-600">VIP Available</p>
-                         )}
-                    </div>
-                ))}
-            </div>
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <p>Loading hotels...</p>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64 text-red-500">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (
+    !searchResults ||
+    !searchResults.hotels ||
+    searchResults.hotels.length === 0
+  ) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p>No hotels found for your search criteria.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-8 px-4 lg:px-0">
+      {searchResults.city && (
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            Hotels in {searchResults.city.name}
+          </h2>
+          <p className="text-gray-600">{searchResults.city.description}</p>
+        </div>
+      )}
+        
+      {(mapCenter ||
+        searchResults.hotels.some(
+          (h) =>
+            typeof h.latitude === "number" && typeof h.longitude === "number"
+        )) && (
+        <div className="mb-8 mx-auto w-1/3 h-96 rounded-lg overflow-hidden shadow-lg">
+          <MapComponent center={mapCenter} hotels={searchResults.hotels} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {searchResults.hotels.map((hotel) => (
+          <div
+            key={hotel.id} // Assuming hotel.id is unique and stable
+            className="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-xl"
+          >
+            <div className="h-48 overflow-hidden">
+              <img
+                src={
+                  hotel.hotel_images[0]?.image_url || "/placeholder-image.jpg"
+                }
+                alt={hotel.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-4">
+              <h3 className="text-xl font-semibold text-gray-800">
+                {hotel.name}
+              </h3>
+              <p className="text-sm text-gray-600 mb-2">{hotel.address}</p>
+              <div className="flex items-center mb-2">
+                <span className="text-yellow-500">⭐</span>
+                <span className="ml-1 text-gray-700">
+                  {hotel.rating.toFixed(1)}
+                </span>
+              </div>
+              <div className="flex items-baseline mb-4">
+                {hotel.discount_percentage > 0 ? (
+                  <>
+                    <span className="text-lg font-bold text-red-600 mr-2">
+                      Rp
+                      {(
+                        hotel.price_per_night *
+                        (1 - hotel.discount_percentage / 100)
+                      ).toLocaleString("id-ID")}
+                    </span>
+                    <span className="text-sm text-gray-500 line-through">
+                      Rp{hotel.price_per_night.toLocaleString("id-ID")}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-lg font-bold text-green-600">
+                    Rp{hotel.price_per_night.toLocaleString("id-ID")}
+                  </span>
+                )}
+              </div>
+              {hotel.vip_available && (
+                <span className="inline-block bg-purple-500 text-white text-xs font-semibold px-2 py-1 rounded-full mt-2">
+                  VIP Available
+                </span>
+              )}
+              <div className="mt-4">
+                <a
+                  href={`/hotels/${hotel.id}`}
+                  className="inline-block bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+                >
+                  See Details
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-export default SearchResultsPage; // Pastikan ini di export
+export default SearchResultsPage;
+
+

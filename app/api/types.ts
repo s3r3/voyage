@@ -10,7 +10,7 @@ export interface Services {
 export interface HotelServices {
   hotel_id: number;
   service_id: number;
-  services: Services; // Assuming a relation is embedded like in Supabase joins
+  services: Services;
 }
 
 export interface HotelImages {
@@ -24,18 +24,19 @@ export interface HotelImages {
 export interface Hotel {
   id: number;
   name: string;
-  description: string | null; // Assuming description can be null
+  description: string | null;
   address: string;
   city_id: number;
   latitude: number;
   longitude: number;
-  rating: number; // Assuming rating is a number
-  price_per_night: number; // Assuming price is a number
-  vip_available: boolean; // Assuming VIP is a boolean
+  rating: number;
+  discount_percentage: number;
+  price_per_night: number;
+  vip_available: boolean;
 
   // Relations - based on how your API route fetches and structures the data
-  hotel_images: HotelImages[]; // Array of image objects
-  hotel_services: HotelServices[]; // Array of service objects
+  hotel_images: HotelImages[];
+  hotel_services: HotelServices[];
 
   // If city data is embedded directly in the hotel object (less likely but possible)
   // city?: {
@@ -46,25 +47,23 @@ export interface Hotel {
 }
 
 // You might also want a general type for API responses if they follow a pattern
-// export interface ApiResponse<T> {
-//   data?: T;
-//   error?: string;
-//   message?: string;
-// }
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  message?: string;
+}
 
 // Example of using this typing for the API search result structure
-// This matches the ApiSearchResult interface we defined in searchResultPage.tsx
-// You can move the ApiSearchResult definition here if you prefer.
-/*
+// This matches the SearchResultsData interface defined in searchResultPage.tsx
+// It's better to define this structure here so it's consistent across the app.
 export interface HotelSearchResult {
-    hotels: Hotel[];
-    city: {
-      id: number;
-      name: string;
-      description: string | null;
-      latitude: number;
-      longitude: number;
-    } | null;
-    error?: string;
+  hotels: Hotel[];
+  city: {
+    id: number;
+    name: string;
+    description: string | null;
+    latitude: number;
+    longitude: number;
+  } | null;
+  error?: string;
 }
-*/
