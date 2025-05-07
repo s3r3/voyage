@@ -1,12 +1,11 @@
 // app/search-results/page.tsx
-import SearchResultsPage from "app/ui/landing/hotels/components/searchResultPage"; // Sesuaikan path jika komponen Anda ada di tempat lain
+import React, { Suspense } from "react";
+import SearchResultsPage from "app/ui/landing/hotels/components/searchResultPage";
 
-// Ini adalah komponen halaman yang di-render oleh Next.js
 export default function Page() {
   return (
-    <div>
-      {/* Render komponen SearchResultsPage Anda di sini */}
+    <Suspense fallback={<div>Memuat hasil pencarian...</div>}>
       <SearchResultsPage />
-    </div>
+    </Suspense>
   );
 }
