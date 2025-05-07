@@ -9,9 +9,9 @@
 
   export async function GET() {
     const { data, error } = await supabase
-      .from('special_offers')
+      .from('avatar')
       .select('*')
-      .order('title');
+      .order('name');
 
     if (error) {
       return new Response(JSON.stringify({ error: error.message }), {
@@ -26,4 +26,4 @@
       },
     });
   }
-  
+

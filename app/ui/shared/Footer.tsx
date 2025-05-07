@@ -4,7 +4,7 @@ import Link from "next/link"; // Use Link if these should be internal links
 
 const Footer = () => {
   return (
-    <footer className="mt-10">
+    <footer className="mt-10 z-auto">
       <div className="bg-black py-4 px-4 text-lg text-gray-600">
         <div className="flex gap-4">
           <div className="w-[240px] text-white">

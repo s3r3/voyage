@@ -74,6 +74,7 @@ const WorldMap = () => {
           alt="World Map"
           width={1440}
           height={600}
+          objectFit='cover'
           className="h-[498px] bg-cover object-cover w-full"
         />
         <div className="absolute inset-0 opacity-20" />
