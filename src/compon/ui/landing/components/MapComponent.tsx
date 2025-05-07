@@ -13,22 +13,25 @@ import "leaflet/dist/leaflet.css";
 import { Hotel } from "app/api/types";
 import * as Leaflet from "leaflet"; // Import Leaflet secara eksplisit
 
-// Dynamic import untuk Leaflet dan terapkan fix
-let L: typeof Leaflet | undefined;
-
+// Deklarasikan L di luar blok 'if'
+let L: any; // Declare L here to use it globally
+// Dynamic import of Leaflet and apply fix
 if (typeof window !== "undefined") {
   import("leaflet")
     .then((leaflet) => {
-      L = leaflet;
+      L = leaflet; // Inisialisasi L di sini setelah Leaflet dimuat
 
-      // Hanya terapkan fix setelah Leaflet dimuat
-      leaflet.Icon.Default.mergeOptions({
+      // Terapkan perbaikan hanya setelah Leaflet dimuat
+      (L.Icon.Default.prototype as any)._getIconUrl = undefined;
+
+      L.Icon.Default.mergeOptions({
+        // Corrected paths - remove 'public/' prefix, assuming images are in public/images
         iconUrl: "/images/marker-icon.png",
         iconRetinaUrl: "/images/marker-icon-2x.png",
         shadowUrl: "/images/marker-shadow.png",
       });
     })
-    .catch((err) => console.error("Gagal memuat Leaflet:", err));
+    .catch((err) => console.error("Failed to load Leaflet:", err));
 }
 
 // Komponen untuk menangani perubahan pusat peta
@@ -104,9 +107,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ center, hotels }) => {
       {/* Marker untuk Kota (Pusat) */}
       {center && (
         <Marker position={center} icon={customIcon}>
-          <Popup>
-            Lokasi Kota
-          </Popup>
+          <Popup>Lokasi Kota</Popup>
         </Marker>
       )}
 
@@ -136,4 +137,3 @@ const MapComponent: React.FC<MapComponentProps> = ({ center, hotels }) => {
 };
 
 export default MapComponent;
-
