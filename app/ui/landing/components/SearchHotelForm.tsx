@@ -9,67 +9,61 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useHotelStore } from "app/store/dateHotel"; // Create a new store for hotel dates
 import GuestRoomSelector from "./GuestRoomSelector"; // Create a new component for guest and room selection
 
-import VIPSelector from "./VIPSelector"; // Create a new component for VIP selectio}}
+import VIPSelector from "./VIPSelector"; // Create a new component for VIP selection
 
 import { useRouter } from "next/navigation"; // Import useRouter
 import { useGuestRoomStore } from "app/store/useGuestRoomStore"; // Import GuestRoomStore
 import { useVIPStore } from "app/store/useVIPStore"; // Import VIPStore
 
 const HotelDateRangePicker = () => {
-  // ... HotelDateRangePicker code ...
-  {
-    {
-      const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } =
-        useHotelStore();
+  const { checkInDate, checkOutDate, setCheckInDate, setCheckOutDate } =
+    useHotelStore();
 
-      return (
-        <div className="flex items-center gap-2 p-2 rounded h-[56px]">
-          <Icon icon="tabler:calendar" className="w-6 h-6 text-[#07689F]" />
-          <div className="flex gap-2">
-            <div className="flex flex-col">
-              <label className="text-xs font-medium text-gray-600">
-                Check-in
-              </label>
-              <DatePicker
-                selected={checkInDate}
-                onChange={setCheckInDate}
-                selectsStart
-                startDate={checkInDate}
-                endDate={checkOutDate}
-                placeholderText="Select check-in"
-                dateFormat="dd/MM/yyyy"
-                minDate={new Date()}
-                className="text-sm px-2 py-1 border-none focus:outline-none w-full"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="text-xs font-medium text-gray-600">
-                Check-out
-              </label>
-              <DatePicker
-                selected={checkOutDate}
-                onChange={setCheckOutDate}
-                selectsEnd
-                startDate={checkInDate}
-                endDate={checkOutDate}
-                placeholderText="Select check-out"
-                dateFormat="dd/MM/yyyy"
-                minDate={checkInDate || new Date()}
-                className="text-sm px-2 py-1 border-none focus:outline-none w-full"
-                disabled={!checkInDate}
-              />
-            </div>
-          </div>
+  return (
+    <div className="flex items-center gap-2 p-2 rounded h-[56px]">
+      <Icon icon="tabler:calendar" className="w-6 h-6 text-[#07689F]" />
+      <div className="flex gap-2">
+        <div className="flex flex-col">
+          <label className="text-xs font-medium text-gray-600">
+            Check-in
+          </label>
+          <DatePicker
+            selected={checkInDate}
+            onChange={setCheckInDate}
+            selectsStart
+            startDate={checkInDate}
+            endDate={checkOutDate}
+            placeholderText="Select check-in"
+            dateFormat="dd/MM/yyyy"
+            minDate={new Date()}
+            className="text-sm px-2 py-1 border-none focus:outline-none w-full"
+          />
         </div>
-      );
-    }
-  }
+        <div className="flex flex-col">
+          <label className="text-xs font-medium text-gray-600">
+            Check-out
+          </label>
+          <DatePicker
+            selected={checkOutDate}
+            onChange={setCheckOutDate}
+            selectsEnd
+            startDate={checkInDate}
+            endDate={checkOutDate}
+            placeholderText="Select check-out"
+            dateFormat="dd/MM/yyyy"
+            minDate={checkInDate || new Date()}
+            className="text-sm px-2 py-1 border-none focus:outline-none w-full"
+            disabled={!checkInDate}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const SearchHotelForm = () => {
   const router = useRouter(); // Initialize router
-  // Tambahkan state lokal untuk input lokasi jika tidak menggunakan store global
-  const [location, setLocation] = React.useState("");
+  const [location, setLocation] = React.useState(""); // State lokal untuk input lokasi
 
   const handleSearch = () => {
     // Access date state from useHotelStore
@@ -79,13 +73,14 @@ const SearchHotelForm = () => {
     // Access VIP state from useVIPStore
     const { isVIP } = useVIPStore.getState(); // Assuming VIP store has an 'isVIP' state
 
-    // Ambil lokasi dari state lokal atau store global
-    // const location = 'Gothenburg'; // Ganti dengan nilai input sesungguhnya
-
     // Persiapkan parameter pencarian
     const queryParams = new URLSearchParams({
       location: location,
-      // Pastikan dikonversi ke string
+      checkin: checkInDate?.toISOString().split('T')[0] || '',
+      checkout: checkOutDate?.toISOString().split('T')[0] || '',
+      guests: guests.toString(),
+      rooms: rooms.toString(),
+      vip: isVIP.toString(),
     }).toString();
 
     // Arahkan ke halaman hasil pencarian

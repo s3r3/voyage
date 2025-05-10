@@ -18,7 +18,9 @@ const Navigation = () => {
   return (
     <nav className="flex justify-center gap-2 py-4">
       {navItems.map((item, index) => {
-        const isActive = item.href === pathname;
+        const isActive =
+          item.href === pathname ||
+          (item.label === "Hotel" && pathname.includes("/search-results"));
         const linkClasses = `w-[121px] h-[40px] rounded-full border border-gray-300 opacity-75 hover:bg-[#07689F] hover:text-white hover:opacity-100 transition-colors flex justify-center items-center ${
           isActive ? "bg-[#07689F] text-white opacity-100" : ""
         }`;
