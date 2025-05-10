@@ -3,8 +3,8 @@
 
 import React from "react";
 import { Icon } from "@iconify/react";
-import { Input } from "../../../../components/ui/input"; // Adjust path as needed
-import { Button } from "../../../../components/ui/button";
+import { Input } from "../../components/ui/input"; // Adjust path as needed
+import { Button } from "../../components/ui/button";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useFlightStore } from "../../../store/dateFlight"; // Adjust path as needed
@@ -54,17 +54,17 @@ const FlightDateRangePicker = () => {
 };
 
 const SearchForm = () => {
-    // You can add state for location here if needed,
-    // or manage it in a Zustand store if shared elsewhere.
-    // For now, let's assume location is local to this form or managed elsewhere.
+  // You can add state for location here if needed,
+  // or manage it in a Zustand store if shared elsewhere.
+  // For now, let's assume location is local to this form or managed elsewhere.
 
-    const handleSearch = () => {
-        // Implement search logic here
-        console.log("Searching...");
-        // Access date state from useFlightStore
-        // Access guest state from useGuestStore
-        // Access location state (if managed here)
-    }
+  const handleSearch = () => {
+    // Implement search logic here
+    console.log("Searching...");
+    // Access date state from useFlightStore
+    // Access guest state from useGuestStore
+    // Access location state (if managed here)
+  };
 
   return (
     <div className="flex justify-center absolute   w-full max-w-[1200px]">
@@ -96,4 +96,3 @@ const SearchForm = () => {
 };
 
 export default SearchForm;
-

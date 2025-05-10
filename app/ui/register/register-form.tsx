@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "components/ui/button";
-import { Checkbox } from "components/ui/checkbox";
-import { Input } from "components/ui/input";
-import { Label } from "components/ui/label";
+import { Button } from "app/ui/components/ui/button";
+import { Checkbox } from "app/ui/components/ui/checkbox";
+import { Input } from "app/ui/components/ui/input";
+import { Label } from "app/ui/components/ui/label";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 
@@ -19,7 +19,6 @@ export default function RegisterForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

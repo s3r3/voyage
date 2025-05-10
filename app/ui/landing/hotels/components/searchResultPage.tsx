@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import MapComponent from "@/compon/ui/landing/components/MapComponentWrapper";
+import MapComponent from "app/ui/components/_MapComponent/MapComponentWrapper";
 import { Hotel, HotelSearchResult } from "app/api/types"; // Adjust the import path as necessary
 
 function SearchResultsPage() {
@@ -103,7 +103,7 @@ function SearchResultsPage() {
           <p className="text-gray-600">{searchResults.city.description}</p>
         </div>
       )}
-        
+
       {(mapCenter ||
         searchResults.hotels.some(
           (h) =>
@@ -182,5 +182,3 @@ function SearchResultsPage() {
 }
 
 export default SearchResultsPage;
-
-

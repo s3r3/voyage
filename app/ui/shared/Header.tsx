@@ -4,8 +4,8 @@
 import React from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
-import { Input } from "../../../components/ui/input"; // Adjust path
-import { Button } from "../../../components/ui/button"; // Adjust path
+import { Input } from "../components/ui/input"; // Adjust path
+import { Button } from "../components/ui/button"; // Adjust path
 import Link from "next/link";
 import { useSession } from "app/lib/auth"; // Adjust path
 import UserDropdown from "../landing/userDropdown"; // Adjust path
