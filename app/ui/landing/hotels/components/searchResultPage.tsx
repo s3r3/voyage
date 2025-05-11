@@ -162,26 +162,26 @@ function SearchResultsPage() {
                         {(
                           hotel.price_per_night *
                           (1 - hotel.discount_percentage / 100)
-                        ).toLocaleString("id-ID")}
+                        ).toLocaleString("us-US")}
                       </span>
                       <span className="text-sm text-gray-500 line-through">
-                        Rp{hotel.price_per_night.toLocaleString("id-ID")}
+                        ${hotel.price_per_night.toLocaleString("us-US")}
                       </span>
                     </>
                   ) : (
                     <span className="text-lg font-bold text-green-600">
-                      Rp{hotel.price_per_night.toLocaleString("id-ID")}
+                      ${hotel.price_per_night.toLocaleString("us-US")}
                     </span>
                   )}
                 </div>
-                <div className="mt-4">
-                  <a
-                    href={`/hotels/${hotel.id}`}
-                    className="inline-block bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
-                  >
-                    See Details
-                  </a>
-                </div>
+              </div>
+              <div className="mt-4">
+                <a
+                  href={`/hotels/${hotel.id}`}
+                  className="inline-block bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300"
+                >
+                  See Details
+                </a>
               </div>
             </div>
           ))}
